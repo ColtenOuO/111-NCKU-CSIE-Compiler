@@ -1,0 +1,4096 @@
+Nonterminals useless in grammar
+
+    Type
+    unary_op
+    math_stmt
+
+
+Terminals unused in grammar
+
+    NEWLINE
+    RSHIFT
+
+
+Rules useless in grammar
+
+  154 math_stmt: math_stmt math_stmt
+  155          | ID
+  156          | math_stmt '+' ID
+  157          | math_stmt '-' ID
+  158          | math_stmt '*' ID
+  159          | math_stmt '/' ID
+  160          | math_stmt '%' ID
+
+
+Rules useless in parser due to conflicts
+
+   33 $@3: ε
+
+   35 $@4: ε
+
+   37 $@5: ε
+
+   91 expr: term
+
+
+State 38 conflicts: 13 reduce/reduce
+State 51 conflicts: 3 reduce/reduce
+State 76 conflicts: 3 shift/reduce
+State 94 conflicts: 2 shift/reduce
+State 213 conflicts: 22 shift/reduce
+State 219 conflicts: 8 shift/reduce
+State 226 conflicts: 3 shift/reduce
+State 238 conflicts: 22 reduce/reduce
+
+
+Grammar
+
+    0 $accept: Program $end
+
+    1 Program: GlobalStatementList
+
+    2 GlobalStatementList: GlobalStatementList GlobalStatement
+    3                    | GlobalStatement
+
+    4 GlobalStatement: FunctionDeclStmt
+
+    5 Func_opt: Func_opt Func_opt
+    6         | ID
+    7         | INT
+    8         | FLOAT
+    9         | BOOL
+   10         | ARROW
+   11         | ':'
+   12         | ','
+   13         | ')'
+
+   14 return_stmt: RETURN INT
+   15            | RETURN FLOAT
+   16            | RETURN TRUE
+   17            | RETURN FALSE
+
+   18 $@1: ε
+
+   19 FunctionDeclStmt: FUNC ID $@1 '(' Func_opt Block
+   20                 | PrintStmt ';'
+
+   21 $@2: ε
+
+   22 FunctionDeclStmt: Stmt $@2 ';'
+   23                 | Simpile_stmt ';'
+   24                 | if_stmt
+   25                 | while_stmt
+   26                 | array_stmt ';'
+   27                 | break_stmt ';'
+   28                 | for_stmt
+   29                 | func_stmt
+   30                 | return_stmt ';'
+   31                 | expr ';'
+   32                 | Block
+
+   33 $@3: ε
+
+   34 func_stmt: FUNC ID $@3 '(' ID ':' INT ',' ID ':' INT ')' func_element Block
+
+   35 $@4: ε
+
+   36 func_stmt: FUNC ID $@4 '(' ')' Block
+
+   37 $@5: ε
+
+   38 func_stmt: FUNC ID $@5 '(' func_element ')' ARROW BOOL Block
+
+   39 func_element: func_element func_element
+   40             | ':'
+   41             | ','
+   42             | ID INT
+   43             | ID FLOAT
+
+   44 break_stmt: BREAK '"' STRING_LIT '"'
+
+   45 $@6: ε
+
+   46 array_stmt: LET ID ':' '[' INT ';' INT_LIT $@6 ']' '=' '[' INT_LIT
+   47           | array_stmt array_stmt
+   48           | new_element
+   49           | array_stmt_again
+
+   50 array_stmt_again: ']'
+
+   51 new_element: ',' INT_LIT
+   52            | ',' FLOAT_LIT
+
+   53 Simpile_stmt: ID ADD_ASSIGN expr
+   54             | ID SUB_ASSIGN expr
+   55             | ID MUL_ASSIGN expr
+   56             | ID REM_ASSIGN expr
+   57             | ID DIV_ASSIGN expr
+   58             | ID '=' ID LSHIFT ID
+   59             | ID '=' expr
+   60             | ID '=' '"' STRING_LIT '"'
+   61             | ID '=' '"' '"'
+
+   62 $@7: ε
+
+   63 $@8: ε
+
+   64 if_stmt: IF $@7 expr $@8 if_continue
+
+   65 $@9: ε
+
+   66 $@10: ε
+
+   67 if_continue: Block $@9 ELSE $@10 else_stmt
+   68            | Block
+
+   69 else_stmt: if_stmt
+   70          | Block
+
+   71 $@11: ε
+
+   72 $@12: ε
+
+   73 while_stmt: WHILE $@11 expr $@12 Block
+
+   74 $@13: ε
+
+   75 for_stmt: FOR ID IN ID $@13 for_block
+
+   76 $@14: ε
+
+   77 for_block: '{' GlobalStatementList $@14 '}'
+   78          | GlobalStatementList for_block
+
+   79 expr: term
+   80     | expr '+' expr
+   81     | expr '-' expr
+   82     | expr '>' expr
+   83     | expr '<' expr
+   84     | expr LOR expr
+   85     | expr LAND expr
+   86     | expr GEQ expr
+   87     | expr LEQ expr
+   88     | expr EQL expr
+   89     | expr NEQ expr
+   90     | term AS factor
+   91     | term
+
+   92 term: term '*' factor
+   93     | term '/' factor
+   94     | term '%' factor
+   95     | factor
+
+   96 factor: '(' expr ')'
+   97       | ID
+   98       | ValueStmt
+   99       | '-' factor
+  100       | '!' factor
+
+  101 ValueStmt: TRUE
+  102          | FALSE
+  103          | INT_LIT
+  104          | FLOAT_LIT
+  105          | INT
+  106          | FLOAT
+
+  107 $@15: ε
+
+  108 $@16: ε
+
+  109 Block: '{' $@15 GlobalStatementList $@16 '}'
+
+  110 PrintStmt: PrintStmt PrintStmt
+  111          | PRINT '(' string_stmt ')'
+  112          | PRINTLN '(' string_stmt ')'
+  113          | PRINT '(' expr ')'
+  114          | PRINTLN '(' expr ')'
+
+  115 $@17: ε
+
+  116 $@18: ε
+
+  117 PrintStmt: PRINTLN '(' ID $@17 '[' INT_LIT $@18 ']' ')'
+
+  118 $@19: ε
+
+  119 $@20: ε
+
+  120 PrintStmt: PRINT '(' ID $@19 '[' INT_LIT $@20 ']' ')'
+
+  121 $@21: ε
+
+  122 string_stmt: '"' STRING_LIT $@21 '"'
+
+  123 Stmt: LET ID ':' Stmt_opt '=' INT_LIT
+  124     | LET ID ':' Stmt_opt
+  125     | LET ID ':' Stmt_opt '=' FLOAT_LIT
+  126     | LET ID ':' Stmt_opt '=' TRUE
+  127     | LET ID ':' Stmt_opt '=' FALSE
+  128     | LET ID ':' Stmt_opt STR '=' '"' STRING_LIT '"'
+  129     | LET ID ':' Stmt_opt STR '=' '"' '"'
+  130     | LET MUT ID ':' Stmt_opt '=' INT_LIT
+  131     | LET MUT ID ':' Stmt_opt '=' FLOAT_LIT
+  132     | LET MUT ID ':' Stmt_opt '=' TRUE
+  133     | LET MUT ID ':' Stmt_opt '=' FALSE
+  134     | LET MUT ID ':' Stmt_opt STR '=' '"' STRING_LIT '"'
+  135     | LET MUT ID ':' Stmt_opt STR '=' '"' '"'
+  136     | LET MUT ID ':' Stmt_opt
+  137     | LET MUT ID '=' INT_LIT
+  138     | LET MUT ID '=' FLOAT_LIT
+  139     | LET ID '=' INT_LIT
+  140     | LET ID '=' FLOAT_LIT
+  141     | LET ID '=' TRUE
+  142     | LET ID '=' FALSE
+
+  143 $@22: ε
+
+  144 Stmt: LET ID ':' Stmt_opt STR '=' LOOP $@22 Block
+  145     | LET MUT ID ':' Stmt_opt STR '=' LOOP Block
+  146     | LET ID ':' Stmt_opt STR '=' '&' ID '[' INT_LIT DOTDOT INT_LIT ']'
+  147     | LET ID ':' Stmt_opt STR '=' '&' ID '[' DOTDOT INT_LIT ']'
+  148     | LET ID ':' Stmt_opt STR '=' '&' ID '[' INT_LIT DOTDOT ']'
+
+  149 Stmt_opt: INT
+  150         | FLOAT
+  151         | BOOL
+  152         | '&'
+  153         | '*'
+
+
+Terminals, with rules where they appear
+
+    $end (0) 0
+    '!' (33) 100
+    '"' (34) 44 60 61 122 128 129 134 135
+    '%' (37) 94
+    '&' (38) 146 147 148 152
+    '(' <s_val> (40) 19 34 36 38 96 111 112 113 114 117 120
+    ')' <s_val> (41) 13 34 36 38 96 111 112 113 114 117 120
+    '*' (42) 92 153
+    '+' (43) 80
+    ',' (44) 12 34 41 51 52
+    '-' (45) 81 99
+    '/' (47) 93
+    ':' (58) 11 34 40 46 123 124 125 126 127 128 129 130 131 132 133 134 135 136 144 145 146 147 148
+    ';' (59) 20 22 23 26 27 30 31 46
+    '<' (60) 83
+    '=' (61) 46 58 59 60 61 123 125 126 127 128 129 130 131 132 133 134 135 137 138 139 140 141 142 144 145 146 147 148
+    '>' (62) 82
+    '[' (91) 46 117 120 146 147 148
+    ']' (93) 46 50 117 120 146 147 148
+    '{' (123) 77 109
+    '}' (125) 77 109
+    error (256)
+    LET (258) 46 123 124 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139 140 141 142 144 145 146 147 148
+    MUT (259) 130 131 132 133 134 135 136 137 138 145
+    NEWLINE (260)
+    INT (261) 7 14 34 42 46 105 149
+    FLOAT (262) 8 15 43 106 150
+    BOOL (263) 9 38 151
+    STR (264) 128 129 134 135 144 145 146 147 148
+    TRUE (265) 16 101 126 132 141
+    FALSE (266) 17 102 127 133 142
+    GEQ (267) 86
+    LEQ (268) 87
+    EQL (269) 88
+    NEQ (270) 89
+    LOR (271) 84
+    LAND (272) 85
+    ADD_ASSIGN (273) 53
+    SUB_ASSIGN (274) 54
+    MUL_ASSIGN (275) 55
+    DIV_ASSIGN (276) 57
+    REM_ASSIGN (277) 56
+    IF (278) 64
+    ELSE (279) 67
+    FOR (280) 75
+    WHILE (281) 73
+    LOOP (282) 144 145
+    PRINT (283) 111 113 120
+    PRINTLN (284) 112 114 117
+    FUNC (285) 19 34 36 38
+    RETURN (286) 14 15 16 17
+    BREAK (287) 44
+    ID <s_val> (288) 6 19 34 36 38 42 43 46 53 54 55 56 57 58 59 60 61 75 97 117 120 123 124 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139 140 141 142 144 145 146 147 148
+    ARROW (289) 10 38
+    AS (290) 90
+    IN (291) 75
+    DOTDOT (292) 146 147 148
+    RSHIFT (293)
+    LSHIFT (294) 58
+    INT_LIT <i_val> (295) 46 51 103 117 120 123 130 137 139 146 147 148
+    FLOAT_LIT <f_val> (296) 52 104 125 131 138 140
+    STRING_LIT <s_val> (297) 44 60 122 128 134
+
+
+Nonterminals, with rules where they appear
+
+    $accept (63)
+        on left: 0
+    Program (64)
+        on left: 1
+        on right: 0
+    GlobalStatementList (65)
+        on left: 2 3
+        on right: 1 2 77 78 109
+    GlobalStatement (66)
+        on left: 4
+        on right: 2 3
+    Func_opt (67)
+        on left: 5 6 7 8 9 10 11 12 13
+        on right: 5 19
+    return_stmt (68)
+        on left: 14 15 16 17
+        on right: 30
+    FunctionDeclStmt <s_val> (69)
+        on left: 19 20 22 23 24 25 26 27 28 29 30 31 32
+        on right: 4
+    $@1 (70)
+        on left: 18
+        on right: 19
+    $@2 (71)
+        on left: 21
+        on right: 22
+    func_stmt (72)
+        on left: 34 36 38
+        on right: 29
+    $@3 (73)
+        on left: 33
+        on right: 34
+    $@4 (74)
+        on left: 35
+        on right: 36
+    $@5 (75)
+        on left: 37
+        on right: 38
+    func_element (76)
+        on left: 39 40 41 42 43
+        on right: 34 38 39
+    break_stmt (77)
+        on left: 44
+        on right: 27
+    array_stmt (78)
+        on left: 46 47 48 49
+        on right: 26 47
+    $@6 (79)
+        on left: 45
+        on right: 46
+    array_stmt_again (80)
+        on left: 50
+        on right: 49
+    new_element (81)
+        on left: 51 52
+        on right: 48
+    Simpile_stmt (82)
+        on left: 53 54 55 56 57 58 59 60 61
+        on right: 23
+    if_stmt (83)
+        on left: 64
+        on right: 24 69
+    $@7 (84)
+        on left: 62
+        on right: 64
+    $@8 (85)
+        on left: 63
+        on right: 64
+    if_continue (86)
+        on left: 67 68
+        on right: 64
+    $@9 (87)
+        on left: 65
+        on right: 67
+    $@10 (88)
+        on left: 66
+        on right: 67
+    else_stmt (89)
+        on left: 69 70
+        on right: 67
+    while_stmt (90)
+        on left: 73
+        on right: 25
+    $@11 (91)
+        on left: 71
+        on right: 73
+    $@12 (92)
+        on left: 72
+        on right: 73
+    for_stmt (93)
+        on left: 75
+        on right: 28
+    $@13 (94)
+        on left: 74
+        on right: 75
+    for_block (95)
+        on left: 77 78
+        on right: 75 78
+    $@14 (96)
+        on left: 76
+        on right: 77
+    expr (97)
+        on left: 79 80 81 82 83 84 85 86 87 88 89 90 91
+        on right: 31 53 54 55 56 57 59 64 73 80 81 82 83 84 85 86 87 88 89 96 113 114
+    term (98)
+        on left: 92 93 94 95
+        on right: 79 90 91 92 93 94
+    factor (99)
+        on left: 96 97 98 99 100
+        on right: 90 92 93 94 95 99 100
+    ValueStmt (100)
+        on left: 101 102 103 104 105 106
+        on right: 98
+    Block <s_val> (101)
+        on left: 109
+        on right: 19 32 34 36 38 67 68 70 73 144 145
+    $@15 (102)
+        on left: 107
+        on right: 109
+    $@16 (103)
+        on left: 108
+        on right: 109
+    PrintStmt (104)
+        on left: 110 111 112 113 114 117 120
+        on right: 20 110
+    $@17 (105)
+        on left: 115
+        on right: 117
+    $@18 (106)
+        on left: 116
+        on right: 117
+    $@19 (107)
+        on left: 118
+        on right: 120
+    $@20 (108)
+        on left: 119
+        on right: 120
+    string_stmt <s_val> (109)
+        on left: 122
+        on right: 111 112
+    $@21 (110)
+        on left: 121
+        on right: 122
+    Stmt (111)
+        on left: 123 124 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139 140 141 142 144 145 146 147 148
+        on right: 22
+    $@22 (112)
+        on left: 143
+        on right: 144
+    Stmt_opt <s_val> (113)
+        on left: 149 150 151 152 153
+        on right: 123 124 125 126 127 128 129 130 131 132 133 134 135 136 144 145 146 147 148
+
+
+State 0
+
+    0 $accept: • Program $end
+
+    LET        shift, and go to state 1
+    INT        shift, and go to state 2
+    FLOAT      shift, and go to state 3
+    TRUE       shift, and go to state 4
+    FALSE      shift, and go to state 5
+    IF         shift, and go to state 6
+    FOR        shift, and go to state 7
+    WHILE      shift, and go to state 8
+    PRINT      shift, and go to state 9
+    PRINTLN    shift, and go to state 10
+    FUNC       shift, and go to state 11
+    RETURN     shift, and go to state 12
+    BREAK      shift, and go to state 13
+    ID         shift, and go to state 14
+    INT_LIT    shift, and go to state 15
+    FLOAT_LIT  shift, and go to state 16
+    '('        shift, and go to state 17
+    '-'        shift, and go to state 18
+    ','        shift, and go to state 19
+    ']'        shift, and go to state 20
+    '{'        shift, and go to state 21
+    '!'        shift, and go to state 22
+
+    Program              go to state 23
+    GlobalStatementList  go to state 24
+    GlobalStatement      go to state 25
+    return_stmt          go to state 26
+    FunctionDeclStmt     go to state 27
+    func_stmt            go to state 28
+    break_stmt           go to state 29
+    array_stmt           go to state 30
+    array_stmt_again     go to state 31
+    new_element          go to state 32
+    Simpile_stmt         go to state 33
+    if_stmt              go to state 34
+    while_stmt           go to state 35
+    for_stmt             go to state 36
+    expr                 go to state 37
+    term                 go to state 38
+    factor               go to state 39
+    ValueStmt            go to state 40
+    Block                go to state 41
+    PrintStmt            go to state 42
+    Stmt                 go to state 43
+
+
+State 1
+
+   46 array_stmt: LET • ID ':' '[' INT ';' INT_LIT $@6 ']' '=' '[' INT_LIT
+  123 Stmt: LET • ID ':' Stmt_opt '=' INT_LIT
+  124     | LET • ID ':' Stmt_opt
+  125     | LET • ID ':' Stmt_opt '=' FLOAT_LIT
+  126     | LET • ID ':' Stmt_opt '=' TRUE
+  127     | LET • ID ':' Stmt_opt '=' FALSE
+  128     | LET • ID ':' Stmt_opt STR '=' '"' STRING_LIT '"'
+  129     | LET • ID ':' Stmt_opt STR '=' '"' '"'
+  130     | LET • MUT ID ':' Stmt_opt '=' INT_LIT
+  131     | LET • MUT ID ':' Stmt_opt '=' FLOAT_LIT
+  132     | LET • MUT ID ':' Stmt_opt '=' TRUE
+  133     | LET • MUT ID ':' Stmt_opt '=' FALSE
+  134     | LET • MUT ID ':' Stmt_opt STR '=' '"' STRING_LIT '"'
+  135     | LET • MUT ID ':' Stmt_opt STR '=' '"' '"'
+  136     | LET • MUT ID ':' Stmt_opt
+  137     | LET • MUT ID '=' INT_LIT
+  138     | LET • MUT ID '=' FLOAT_LIT
+  139     | LET • ID '=' INT_LIT
+  140     | LET • ID '=' FLOAT_LIT
+  141     | LET • ID '=' TRUE
+  142     | LET • ID '=' FALSE
+  144     | LET • ID ':' Stmt_opt STR '=' LOOP $@22 Block
+  145     | LET • MUT ID ':' Stmt_opt STR '=' LOOP Block
+  146     | LET • ID ':' Stmt_opt STR '=' '&' ID '[' INT_LIT DOTDOT INT_LIT ']'
+  147     | LET • ID ':' Stmt_opt STR '=' '&' ID '[' DOTDOT INT_LIT ']'
+  148     | LET • ID ':' Stmt_opt STR '=' '&' ID '[' INT_LIT DOTDOT ']'
+
+    MUT  shift, and go to state 44
+    ID   shift, and go to state 45
+
+
+State 2
+
+  105 ValueStmt: INT •
+
+    $default  reduce using rule 105 (ValueStmt)
+
+
+State 3
+
+  106 ValueStmt: FLOAT •
+
+    $default  reduce using rule 106 (ValueStmt)
+
+
+State 4
+
+  101 ValueStmt: TRUE •
+
+    $default  reduce using rule 101 (ValueStmt)
+
+
+State 5
+
+  102 ValueStmt: FALSE •
+
+    $default  reduce using rule 102 (ValueStmt)
+
+
+State 6
+
+   64 if_stmt: IF • $@7 expr $@8 if_continue
+
+    $default  reduce using rule 62 ($@7)
+
+    $@7  go to state 46
+
+
+State 7
+
+   75 for_stmt: FOR • ID IN ID $@13 for_block
+
+    ID  shift, and go to state 47
+
+
+State 8
+
+   73 while_stmt: WHILE • $@11 expr $@12 Block
+
+    $default  reduce using rule 71 ($@11)
+
+    $@11  go to state 48
+
+
+State 9
+
+  111 PrintStmt: PRINT • '(' string_stmt ')'
+  113          | PRINT • '(' expr ')'
+  120          | PRINT • '(' ID $@19 '[' INT_LIT $@20 ']' ')'
+
+    '('  shift, and go to state 49
+
+
+State 10
+
+  112 PrintStmt: PRINTLN • '(' string_stmt ')'
+  114          | PRINTLN • '(' expr ')'
+  117          | PRINTLN • '(' ID $@17 '[' INT_LIT $@18 ']' ')'
+
+    '('  shift, and go to state 50
+
+
+State 11
+
+   19 FunctionDeclStmt: FUNC • ID $@1 '(' Func_opt Block
+   34 func_stmt: FUNC • ID $@3 '(' ID ':' INT ',' ID ':' INT ')' func_element Block
+   36          | FUNC • ID $@4 '(' ')' Block
+   38          | FUNC • ID $@5 '(' func_element ')' ARROW BOOL Block
+
+    ID  shift, and go to state 51
+
+
+State 12
+
+   14 return_stmt: RETURN • INT
+   15            | RETURN • FLOAT
+   16            | RETURN • TRUE
+   17            | RETURN • FALSE
+
+    INT    shift, and go to state 52
+    FLOAT  shift, and go to state 53
+    TRUE   shift, and go to state 54
+    FALSE  shift, and go to state 55
+
+
+State 13
+
+   44 break_stmt: BREAK • '"' STRING_LIT '"'
+
+    '"'  shift, and go to state 56
+
+
+State 14
+
+   53 Simpile_stmt: ID • ADD_ASSIGN expr
+   54             | ID • SUB_ASSIGN expr
+   55             | ID • MUL_ASSIGN expr
+   56             | ID • REM_ASSIGN expr
+   57             | ID • DIV_ASSIGN expr
+   58             | ID • '=' ID LSHIFT ID
+   59             | ID • '=' expr
+   60             | ID • '=' '"' STRING_LIT '"'
+   61             | ID • '=' '"' '"'
+   97 factor: ID •
+
+    ADD_ASSIGN  shift, and go to state 57
+    SUB_ASSIGN  shift, and go to state 58
+    MUL_ASSIGN  shift, and go to state 59
+    DIV_ASSIGN  shift, and go to state 60
+    REM_ASSIGN  shift, and go to state 61
+    '='         shift, and go to state 62
+
+    $default  reduce using rule 97 (factor)
+
+
+State 15
+
+  103 ValueStmt: INT_LIT •
+
+    $default  reduce using rule 103 (ValueStmt)
+
+
+State 16
+
+  104 ValueStmt: FLOAT_LIT •
+
+    $default  reduce using rule 104 (ValueStmt)
+
+
+State 17
+
+   96 factor: '(' • expr ')'
+
+    INT        shift, and go to state 2
+    FLOAT      shift, and go to state 3
+    TRUE       shift, and go to state 4
+    FALSE      shift, and go to state 5
+    ID         shift, and go to state 63
+    INT_LIT    shift, and go to state 15
+    FLOAT_LIT  shift, and go to state 16
+    '('        shift, and go to state 17
+    '-'        shift, and go to state 18
+    '!'        shift, and go to state 22
+
+    expr       go to state 64
+    term       go to state 38
+    factor     go to state 39
+    ValueStmt  go to state 40
+
+
+State 18
+
+   99 factor: '-' • factor
+
+    INT        shift, and go to state 2
+    FLOAT      shift, and go to state 3
+    TRUE       shift, and go to state 4
+    FALSE      shift, and go to state 5
+    ID         shift, and go to state 63
+    INT_LIT    shift, and go to state 15
+    FLOAT_LIT  shift, and go to state 16
+    '('        shift, and go to state 17
+    '-'        shift, and go to state 18
+    '!'        shift, and go to state 22
+
+    factor     go to state 65
+    ValueStmt  go to state 40
+
+
+State 19
+
+   51 new_element: ',' • INT_LIT
+   52            | ',' • FLOAT_LIT
+
+    INT_LIT    shift, and go to state 66
+    FLOAT_LIT  shift, and go to state 67
+
+
+State 20
+
+   50 array_stmt_again: ']' •
+
+    $default  reduce using rule 50 (array_stmt_again)
+
+
+State 21
+
+  109 Block: '{' • $@15 GlobalStatementList $@16 '}'
+
+    $default  reduce using rule 107 ($@15)
+
+    $@15  go to state 68
+
+
+State 22
+
+  100 factor: '!' • factor
+
+    INT        shift, and go to state 2
+    FLOAT      shift, and go to state 3
+    TRUE       shift, and go to state 4
+    FALSE      shift, and go to state 5
+    ID         shift, and go to state 63
+    INT_LIT    shift, and go to state 15
+    FLOAT_LIT  shift, and go to state 16
+    '('        shift, and go to state 17
+    '-'        shift, and go to state 18
+    '!'        shift, and go to state 22
+
+    factor     go to state 69
+    ValueStmt  go to state 40
+
+
+State 23
+
+    0 $accept: Program • $end
+
+    $end  shift, and go to state 70
+
+
+State 24
+
+    1 Program: GlobalStatementList •
+    2 GlobalStatementList: GlobalStatementList • GlobalStatement
+
+    LET        shift, and go to state 1
+    INT        shift, and go to state 2
+    FLOAT      shift, and go to state 3
+    TRUE       shift, and go to state 4
+    FALSE      shift, and go to state 5
+    IF         shift, and go to state 6
+    FOR        shift, and go to state 7
+    WHILE      shift, and go to state 8
+    PRINT      shift, and go to state 9
+    PRINTLN    shift, and go to state 10
+    FUNC       shift, and go to state 11
+    RETURN     shift, and go to state 12
+    BREAK      shift, and go to state 13
+    ID         shift, and go to state 14
+    INT_LIT    shift, and go to state 15
+    FLOAT_LIT  shift, and go to state 16
+    '('        shift, and go to state 17
+    '-'        shift, and go to state 18
+    ','        shift, and go to state 19
+    ']'        shift, and go to state 20
+    '{'        shift, and go to state 21
+    '!'        shift, and go to state 22
+
+    $default  reduce using rule 1 (Program)
+
+    GlobalStatement   go to state 71
+    return_stmt       go to state 26
+    FunctionDeclStmt  go to state 27
+    func_stmt         go to state 28
+    break_stmt        go to state 29
+    array_stmt        go to state 30
+    array_stmt_again  go to state 31
+    new_element       go to state 32
+    Simpile_stmt      go to state 33
+    if_stmt           go to state 34
+    while_stmt        go to state 35
+    for_stmt          go to state 36
+    expr              go to state 37
+    term              go to state 38
+    factor            go to state 39
+    ValueStmt         go to state 40
+    Block             go to state 41
+    PrintStmt         go to state 42
+    Stmt              go to state 43
+
+
+State 25
+
+    3 GlobalStatementList: GlobalStatement •
+
+    $default  reduce using rule 3 (GlobalStatementList)
+
+
+State 26
+
+   30 FunctionDeclStmt: return_stmt • ';'
+
+    ';'  shift, and go to state 72
+
+
+State 27
+
+    4 GlobalStatement: FunctionDeclStmt •
+
+    $default  reduce using rule 4 (GlobalStatement)
+
+
+State 28
+
+   29 FunctionDeclStmt: func_stmt •
+
+    $default  reduce using rule 29 (FunctionDeclStmt)
+
+
+State 29
+
+   27 FunctionDeclStmt: break_stmt • ';'
+
+    ';'  shift, and go to state 73
+
+
+State 30
+
+   26 FunctionDeclStmt: array_stmt • ';'
+   47 array_stmt: array_stmt • array_stmt
+
+    LET  shift, and go to state 74
+    ','  shift, and go to state 19
+    ';'  shift, and go to state 75
+    ']'  shift, and go to state 20
+
+    array_stmt        go to state 76
+    array_stmt_again  go to state 31
+    new_element       go to state 32
+
+
+State 31
+
+   49 array_stmt: array_stmt_again •
+
+    $default  reduce using rule 49 (array_stmt)
+
+
+State 32
+
+   48 array_stmt: new_element •
+
+    $default  reduce using rule 48 (array_stmt)
+
+
+State 33
+
+   23 FunctionDeclStmt: Simpile_stmt • ';'
+
+    ';'  shift, and go to state 77
+
+
+State 34
+
+   24 FunctionDeclStmt: if_stmt •
+
+    $default  reduce using rule 24 (FunctionDeclStmt)
+
+
+State 35
+
+   25 FunctionDeclStmt: while_stmt •
+
+    $default  reduce using rule 25 (FunctionDeclStmt)
+
+
+State 36
+
+   28 FunctionDeclStmt: for_stmt •
+
+    $default  reduce using rule 28 (FunctionDeclStmt)
+
+
+State 37
+
+   31 FunctionDeclStmt: expr • ';'
+   80 expr: expr • '+' expr
+   81     | expr • '-' expr
+   82     | expr • '>' expr
+   83     | expr • '<' expr
+   84     | expr • LOR expr
+   85     | expr • LAND expr
+   86     | expr • GEQ expr
+   87     | expr • LEQ expr
+   88     | expr • EQL expr
+   89     | expr • NEQ expr
+
+    GEQ   shift, and go to state 78
+    LEQ   shift, and go to state 79
+    EQL   shift, and go to state 80
+    NEQ   shift, and go to state 81
+    LOR   shift, and go to state 82
+    LAND  shift, and go to state 83
+    '>'   shift, and go to state 84
+    '<'   shift, and go to state 85
+    '+'   shift, and go to state 86
+    '-'   shift, and go to state 87
+    ';'   shift, and go to state 88
+
+
+State 38
+
+   79 expr: term •
+   90     | term • AS factor
+   91     | term •
+   92 term: term • '*' factor
+   93     | term • '/' factor
+   94     | term • '%' factor
+
+    AS   shift, and go to state 89
+    '*'  shift, and go to state 90
+    '/'  shift, and go to state 91
+    '%'  shift, and go to state 92
+
+    GEQ       reduce using rule 79 (expr)
+    GEQ       [reduce using rule 91 (expr)]
+    LEQ       reduce using rule 79 (expr)
+    LEQ       [reduce using rule 91 (expr)]
+    EQL       reduce using rule 79 (expr)
+    EQL       [reduce using rule 91 (expr)]
+    NEQ       reduce using rule 79 (expr)
+    NEQ       [reduce using rule 91 (expr)]
+    LOR       reduce using rule 79 (expr)
+    LOR       [reduce using rule 91 (expr)]
+    LAND      reduce using rule 79 (expr)
+    LAND      [reduce using rule 91 (expr)]
+    ')'       reduce using rule 79 (expr)
+    ')'       [reduce using rule 91 (expr)]
+    '>'       reduce using rule 79 (expr)
+    '>'       [reduce using rule 91 (expr)]
+    '<'       reduce using rule 79 (expr)
+    '<'       [reduce using rule 91 (expr)]
+    '+'       reduce using rule 79 (expr)
+    '+'       [reduce using rule 91 (expr)]
+    '-'       reduce using rule 79 (expr)
+    '-'       [reduce using rule 91 (expr)]
+    ';'       reduce using rule 79 (expr)
+    ';'       [reduce using rule 91 (expr)]
+    '{'       reduce using rule 79 (expr)
+    '{'       [reduce using rule 91 (expr)]
+    $default  reduce using rule 79 (expr)
+
+
+State 39
+
+   95 term: factor •
+
+    $default  reduce using rule 95 (term)
+
+
+State 40
+
+   98 factor: ValueStmt •
+
+    $default  reduce using rule 98 (factor)
+
+
+State 41
+
+   32 FunctionDeclStmt: Block •
+
+    $default  reduce using rule 32 (FunctionDeclStmt)
+
+
+State 42
+
+   20 FunctionDeclStmt: PrintStmt • ';'
+  110 PrintStmt: PrintStmt • PrintStmt
+
+    PRINT    shift, and go to state 9
+    PRINTLN  shift, and go to state 10
+    ';'      shift, and go to state 93
+
+    PrintStmt  go to state 94
+
+
+State 43
+
+   22 FunctionDeclStmt: Stmt • $@2 ';'
+
+    $default  reduce using rule 21 ($@2)
+
+    $@2  go to state 95
+
+
+State 44
+
+  130 Stmt: LET MUT • ID ':' Stmt_opt '=' INT_LIT
+  131     | LET MUT • ID ':' Stmt_opt '=' FLOAT_LIT
+  132     | LET MUT • ID ':' Stmt_opt '=' TRUE
+  133     | LET MUT • ID ':' Stmt_opt '=' FALSE
+  134     | LET MUT • ID ':' Stmt_opt STR '=' '"' STRING_LIT '"'
+  135     | LET MUT • ID ':' Stmt_opt STR '=' '"' '"'
+  136     | LET MUT • ID ':' Stmt_opt
+  137     | LET MUT • ID '=' INT_LIT
+  138     | LET MUT • ID '=' FLOAT_LIT
+  145     | LET MUT • ID ':' Stmt_opt STR '=' LOOP Block
+
+    ID  shift, and go to state 96
+
+
+State 45
+
+   46 array_stmt: LET ID • ':' '[' INT ';' INT_LIT $@6 ']' '=' '[' INT_LIT
+  123 Stmt: LET ID • ':' Stmt_opt '=' INT_LIT
+  124     | LET ID • ':' Stmt_opt
+  125     | LET ID • ':' Stmt_opt '=' FLOAT_LIT
+  126     | LET ID • ':' Stmt_opt '=' TRUE
+  127     | LET ID • ':' Stmt_opt '=' FALSE
+  128     | LET ID • ':' Stmt_opt STR '=' '"' STRING_LIT '"'
+  129     | LET ID • ':' Stmt_opt STR '=' '"' '"'
+  139     | LET ID • '=' INT_LIT
+  140     | LET ID • '=' FLOAT_LIT
+  141     | LET ID • '=' TRUE
+  142     | LET ID • '=' FALSE
+  144     | LET ID • ':' Stmt_opt STR '=' LOOP $@22 Block
+  146     | LET ID • ':' Stmt_opt STR '=' '&' ID '[' INT_LIT DOTDOT INT_LIT ']'
+  147     | LET ID • ':' Stmt_opt STR '=' '&' ID '[' DOTDOT INT_LIT ']'
+  148     | LET ID • ':' Stmt_opt STR '=' '&' ID '[' INT_LIT DOTDOT ']'
+
+    ':'  shift, and go to state 97
+    '='  shift, and go to state 98
+
+
+State 46
+
+   64 if_stmt: IF $@7 • expr $@8 if_continue
+
+    INT        shift, and go to state 2
+    FLOAT      shift, and go to state 3
+    TRUE       shift, and go to state 4
+    FALSE      shift, and go to state 5
+    ID         shift, and go to state 63
+    INT_LIT    shift, and go to state 15
+    FLOAT_LIT  shift, and go to state 16
+    '('        shift, and go to state 17
+    '-'        shift, and go to state 18
+    '!'        shift, and go to state 22
+
+    expr       go to state 99
+    term       go to state 38
+    factor     go to state 39
+    ValueStmt  go to state 40
+
+
+State 47
+
+   75 for_stmt: FOR ID • IN ID $@13 for_block
+
+    IN  shift, and go to state 100
+
+
+State 48
+
+   73 while_stmt: WHILE $@11 • expr $@12 Block
+
+    INT        shift, and go to state 2
+    FLOAT      shift, and go to state 3
+    TRUE       shift, and go to state 4
+    FALSE      shift, and go to state 5
+    ID         shift, and go to state 63
+    INT_LIT    shift, and go to state 15
+    FLOAT_LIT  shift, and go to state 16
+    '('        shift, and go to state 17
+    '-'        shift, and go to state 18
+    '!'        shift, and go to state 22
+
+    expr       go to state 101
+    term       go to state 38
+    factor     go to state 39
+    ValueStmt  go to state 40
+
+
+State 49
+
+  111 PrintStmt: PRINT '(' • string_stmt ')'
+  113          | PRINT '(' • expr ')'
+  120          | PRINT '(' • ID $@19 '[' INT_LIT $@20 ']' ')'
+
+    INT        shift, and go to state 2
+    FLOAT      shift, and go to state 3
+    TRUE       shift, and go to state 4
+    FALSE      shift, and go to state 5
+    ID         shift, and go to state 102
+    INT_LIT    shift, and go to state 15
+    FLOAT_LIT  shift, and go to state 16
+    '('        shift, and go to state 17
+    '-'        shift, and go to state 18
+    '"'        shift, and go to state 103
+    '!'        shift, and go to state 22
+
+    expr         go to state 104
+    term         go to state 38
+    factor       go to state 39
+    ValueStmt    go to state 40
+    string_stmt  go to state 105
+
+
+State 50
+
+  112 PrintStmt: PRINTLN '(' • string_stmt ')'
+  114          | PRINTLN '(' • expr ')'
+  117          | PRINTLN '(' • ID $@17 '[' INT_LIT $@18 ']' ')'
+
+    INT        shift, and go to state 2
+    FLOAT      shift, and go to state 3
+    TRUE       shift, and go to state 4
+    FALSE      shift, and go to state 5
+    ID         shift, and go to state 106
+    INT_LIT    shift, and go to state 15
+    FLOAT_LIT  shift, and go to state 16
+    '('        shift, and go to state 17
+    '-'        shift, and go to state 18
+    '"'        shift, and go to state 103
+    '!'        shift, and go to state 22
+
+    expr         go to state 107
+    term         go to state 38
+    factor       go to state 39
+    ValueStmt    go to state 40
+    string_stmt  go to state 108
+
+
+State 51
+
+   19 FunctionDeclStmt: FUNC ID • $@1 '(' Func_opt Block
+   34 func_stmt: FUNC ID • $@3 '(' ID ':' INT ',' ID ':' INT ')' func_element Block
+   36          | FUNC ID • $@4 '(' ')' Block
+   38          | FUNC ID • $@5 '(' func_element ')' ARROW BOOL Block
+
+    '('       reduce using rule 18 ($@1)
+    '('       [reduce using rule 33 ($@3)]
+    '('       [reduce using rule 35 ($@4)]
+    '('       [reduce using rule 37 ($@5)]
+    $default  reduce using rule 18 ($@1)
+
+    $@1  go to state 109
+    $@3  go to state 110
+    $@4  go to state 111
+    $@5  go to state 112
+
+
+State 52
+
+   14 return_stmt: RETURN INT •
+
+    $default  reduce using rule 14 (return_stmt)
+
+
+State 53
+
+   15 return_stmt: RETURN FLOAT •
+
+    $default  reduce using rule 15 (return_stmt)
+
+
+State 54
+
+   16 return_stmt: RETURN TRUE •
+
+    $default  reduce using rule 16 (return_stmt)
+
+
+State 55
+
+   17 return_stmt: RETURN FALSE •
+
+    $default  reduce using rule 17 (return_stmt)
+
+
+State 56
+
+   44 break_stmt: BREAK '"' • STRING_LIT '"'
+
+    STRING_LIT  shift, and go to state 113
+
+
+State 57
+
+   53 Simpile_stmt: ID ADD_ASSIGN • expr
+
+    INT        shift, and go to state 2
+    FLOAT      shift, and go to state 3
+    TRUE       shift, and go to state 4
+    FALSE      shift, and go to state 5
+    ID         shift, and go to state 63
+    INT_LIT    shift, and go to state 15
+    FLOAT_LIT  shift, and go to state 16
+    '('        shift, and go to state 17
+    '-'        shift, and go to state 18
+    '!'        shift, and go to state 22
+
+    expr       go to state 114
+    term       go to state 38
+    factor     go to state 39
+    ValueStmt  go to state 40
+
+
+State 58
+
+   54 Simpile_stmt: ID SUB_ASSIGN • expr
+
+    INT        shift, and go to state 2
+    FLOAT      shift, and go to state 3
+    TRUE       shift, and go to state 4
+    FALSE      shift, and go to state 5
+    ID         shift, and go to state 63
+    INT_LIT    shift, and go to state 15
+    FLOAT_LIT  shift, and go to state 16
+    '('        shift, and go to state 17
+    '-'        shift, and go to state 18
+    '!'        shift, and go to state 22
+
+    expr       go to state 115
+    term       go to state 38
+    factor     go to state 39
+    ValueStmt  go to state 40
+
+
+State 59
+
+   55 Simpile_stmt: ID MUL_ASSIGN • expr
+
+    INT        shift, and go to state 2
+    FLOAT      shift, and go to state 3
+    TRUE       shift, and go to state 4
+    FALSE      shift, and go to state 5
+    ID         shift, and go to state 63
+    INT_LIT    shift, and go to state 15
+    FLOAT_LIT  shift, and go to state 16
+    '('        shift, and go to state 17
+    '-'        shift, and go to state 18
+    '!'        shift, and go to state 22
+
+    expr       go to state 116
+    term       go to state 38
+    factor     go to state 39
+    ValueStmt  go to state 40
+
+
+State 60
+
+   57 Simpile_stmt: ID DIV_ASSIGN • expr
+
+    INT        shift, and go to state 2
+    FLOAT      shift, and go to state 3
+    TRUE       shift, and go to state 4
+    FALSE      shift, and go to state 5
+    ID         shift, and go to state 63
+    INT_LIT    shift, and go to state 15
+    FLOAT_LIT  shift, and go to state 16
+    '('        shift, and go to state 17
+    '-'        shift, and go to state 18
+    '!'        shift, and go to state 22
+
+    expr       go to state 117
+    term       go to state 38
+    factor     go to state 39
+    ValueStmt  go to state 40
+
+
+State 61
+
+   56 Simpile_stmt: ID REM_ASSIGN • expr
+
+    INT        shift, and go to state 2
+    FLOAT      shift, and go to state 3
+    TRUE       shift, and go to state 4
+    FALSE      shift, and go to state 5
+    ID         shift, and go to state 63
+    INT_LIT    shift, and go to state 15
+    FLOAT_LIT  shift, and go to state 16
+    '('        shift, and go to state 17
+    '-'        shift, and go to state 18
+    '!'        shift, and go to state 22
+
+    expr       go to state 118
+    term       go to state 38
+    factor     go to state 39
+    ValueStmt  go to state 40
+
+
+State 62
+
+   58 Simpile_stmt: ID '=' • ID LSHIFT ID
+   59             | ID '=' • expr
+   60             | ID '=' • '"' STRING_LIT '"'
+   61             | ID '=' • '"' '"'
+
+    INT        shift, and go to state 2
+    FLOAT      shift, and go to state 3
+    TRUE       shift, and go to state 4
+    FALSE      shift, and go to state 5
+    ID         shift, and go to state 119
+    INT_LIT    shift, and go to state 15
+    FLOAT_LIT  shift, and go to state 16
+    '('        shift, and go to state 17
+    '-'        shift, and go to state 18
+    '"'        shift, and go to state 120
+    '!'        shift, and go to state 22
+
+    expr       go to state 121
+    term       go to state 38
+    factor     go to state 39
+    ValueStmt  go to state 40
+
+
+State 63
+
+   97 factor: ID •
+
+    $default  reduce using rule 97 (factor)
+
+
+State 64
+
+   80 expr: expr • '+' expr
+   81     | expr • '-' expr
+   82     | expr • '>' expr
+   83     | expr • '<' expr
+   84     | expr • LOR expr
+   85     | expr • LAND expr
+   86     | expr • GEQ expr
+   87     | expr • LEQ expr
+   88     | expr • EQL expr
+   89     | expr • NEQ expr
+   96 factor: '(' expr • ')'
+
+    GEQ   shift, and go to state 78
+    LEQ   shift, and go to state 79
+    EQL   shift, and go to state 80
+    NEQ   shift, and go to state 81
+    LOR   shift, and go to state 82
+    LAND  shift, and go to state 83
+    ')'   shift, and go to state 122
+    '>'   shift, and go to state 84
+    '<'   shift, and go to state 85
+    '+'   shift, and go to state 86
+    '-'   shift, and go to state 87
+
+
+State 65
+
+   99 factor: '-' factor •
+
+    $default  reduce using rule 99 (factor)
+
+
+State 66
+
+   51 new_element: ',' INT_LIT •
+
+    $default  reduce using rule 51 (new_element)
+
+
+State 67
+
+   52 new_element: ',' FLOAT_LIT •
+
+    $default  reduce using rule 52 (new_element)
+
+
+State 68
+
+  109 Block: '{' $@15 • GlobalStatementList $@16 '}'
+
+    LET        shift, and go to state 1
+    INT        shift, and go to state 2
+    FLOAT      shift, and go to state 3
+    TRUE       shift, and go to state 4
+    FALSE      shift, and go to state 5
+    IF         shift, and go to state 6
+    FOR        shift, and go to state 7
+    WHILE      shift, and go to state 8
+    PRINT      shift, and go to state 9
+    PRINTLN    shift, and go to state 10
+    FUNC       shift, and go to state 11
+    RETURN     shift, and go to state 12
+    BREAK      shift, and go to state 13
+    ID         shift, and go to state 14
+    INT_LIT    shift, and go to state 15
+    FLOAT_LIT  shift, and go to state 16
+    '('        shift, and go to state 17
+    '-'        shift, and go to state 18
+    ','        shift, and go to state 19
+    ']'        shift, and go to state 20
+    '{'        shift, and go to state 21
+    '!'        shift, and go to state 22
+
+    GlobalStatementList  go to state 123
+    GlobalStatement      go to state 25
+    return_stmt          go to state 26
+    FunctionDeclStmt     go to state 27
+    func_stmt            go to state 28
+    break_stmt           go to state 29
+    array_stmt           go to state 30
+    array_stmt_again     go to state 31
+    new_element          go to state 32
+    Simpile_stmt         go to state 33
+    if_stmt              go to state 34
+    while_stmt           go to state 35
+    for_stmt             go to state 36
+    expr                 go to state 37
+    term                 go to state 38
+    factor               go to state 39
+    ValueStmt            go to state 40
+    Block                go to state 41
+    PrintStmt            go to state 42
+    Stmt                 go to state 43
+
+
+State 69
+
+  100 factor: '!' factor •
+
+    $default  reduce using rule 100 (factor)
+
+
+State 70
+
+    0 $accept: Program $end •
+
+    $default  accept
+
+
+State 71
+
+    2 GlobalStatementList: GlobalStatementList GlobalStatement •
+
+    $default  reduce using rule 2 (GlobalStatementList)
+
+
+State 72
+
+   30 FunctionDeclStmt: return_stmt ';' •
+
+    $default  reduce using rule 30 (FunctionDeclStmt)
+
+
+State 73
+
+   27 FunctionDeclStmt: break_stmt ';' •
+
+    $default  reduce using rule 27 (FunctionDeclStmt)
+
+
+State 74
+
+   46 array_stmt: LET • ID ':' '[' INT ';' INT_LIT $@6 ']' '=' '[' INT_LIT
+
+    ID  shift, and go to state 124
+
+
+State 75
+
+   26 FunctionDeclStmt: array_stmt ';' •
+
+    $default  reduce using rule 26 (FunctionDeclStmt)
+
+
+State 76
+
+   47 array_stmt: array_stmt • array_stmt
+   47           | array_stmt array_stmt •
+
+    LET  shift, and go to state 74
+    ','  shift, and go to state 19
+    ']'  shift, and go to state 20
+
+    LET       [reduce using rule 47 (array_stmt)]
+    ','       [reduce using rule 47 (array_stmt)]
+    ']'       [reduce using rule 47 (array_stmt)]
+    $default  reduce using rule 47 (array_stmt)
+
+    array_stmt        go to state 76
+    array_stmt_again  go to state 31
+    new_element       go to state 32
+
+
+State 77
+
+   23 FunctionDeclStmt: Simpile_stmt ';' •
+
+    $default  reduce using rule 23 (FunctionDeclStmt)
+
+
+State 78
+
+   86 expr: expr GEQ • expr
+
+    INT        shift, and go to state 2
+    FLOAT      shift, and go to state 3
+    TRUE       shift, and go to state 4
+    FALSE      shift, and go to state 5
+    ID         shift, and go to state 63
+    INT_LIT    shift, and go to state 15
+    FLOAT_LIT  shift, and go to state 16
+    '('        shift, and go to state 17
+    '-'        shift, and go to state 18
+    '!'        shift, and go to state 22
+
+    expr       go to state 125
+    term       go to state 38
+    factor     go to state 39
+    ValueStmt  go to state 40
+
+
+State 79
+
+   87 expr: expr LEQ • expr
+
+    INT        shift, and go to state 2
+    FLOAT      shift, and go to state 3
+    TRUE       shift, and go to state 4
+    FALSE      shift, and go to state 5
+    ID         shift, and go to state 63
+    INT_LIT    shift, and go to state 15
+    FLOAT_LIT  shift, and go to state 16
+    '('        shift, and go to state 17
+    '-'        shift, and go to state 18
+    '!'        shift, and go to state 22
+
+    expr       go to state 126
+    term       go to state 38
+    factor     go to state 39
+    ValueStmt  go to state 40
+
+
+State 80
+
+   88 expr: expr EQL • expr
+
+    INT        shift, and go to state 2
+    FLOAT      shift, and go to state 3
+    TRUE       shift, and go to state 4
+    FALSE      shift, and go to state 5
+    ID         shift, and go to state 63
+    INT_LIT    shift, and go to state 15
+    FLOAT_LIT  shift, and go to state 16
+    '('        shift, and go to state 17
+    '-'        shift, and go to state 18
+    '!'        shift, and go to state 22
+
+    expr       go to state 127
+    term       go to state 38
+    factor     go to state 39
+    ValueStmt  go to state 40
+
+
+State 81
+
+   89 expr: expr NEQ • expr
+
+    INT        shift, and go to state 2
+    FLOAT      shift, and go to state 3
+    TRUE       shift, and go to state 4
+    FALSE      shift, and go to state 5
+    ID         shift, and go to state 63
+    INT_LIT    shift, and go to state 15
+    FLOAT_LIT  shift, and go to state 16
+    '('        shift, and go to state 17
+    '-'        shift, and go to state 18
+    '!'        shift, and go to state 22
+
+    expr       go to state 128
+    term       go to state 38
+    factor     go to state 39
+    ValueStmt  go to state 40
+
+
+State 82
+
+   84 expr: expr LOR • expr
+
+    INT        shift, and go to state 2
+    FLOAT      shift, and go to state 3
+    TRUE       shift, and go to state 4
+    FALSE      shift, and go to state 5
+    ID         shift, and go to state 63
+    INT_LIT    shift, and go to state 15
+    FLOAT_LIT  shift, and go to state 16
+    '('        shift, and go to state 17
+    '-'        shift, and go to state 18
+    '!'        shift, and go to state 22
+
+    expr       go to state 129
+    term       go to state 38
+    factor     go to state 39
+    ValueStmt  go to state 40
+
+
+State 83
+
+   85 expr: expr LAND • expr
+
+    INT        shift, and go to state 2
+    FLOAT      shift, and go to state 3
+    TRUE       shift, and go to state 4
+    FALSE      shift, and go to state 5
+    ID         shift, and go to state 63
+    INT_LIT    shift, and go to state 15
+    FLOAT_LIT  shift, and go to state 16
+    '('        shift, and go to state 17
+    '-'        shift, and go to state 18
+    '!'        shift, and go to state 22
+
+    expr       go to state 130
+    term       go to state 38
+    factor     go to state 39
+    ValueStmt  go to state 40
+
+
+State 84
+
+   82 expr: expr '>' • expr
+
+    INT        shift, and go to state 2
+    FLOAT      shift, and go to state 3
+    TRUE       shift, and go to state 4
+    FALSE      shift, and go to state 5
+    ID         shift, and go to state 63
+    INT_LIT    shift, and go to state 15
+    FLOAT_LIT  shift, and go to state 16
+    '('        shift, and go to state 17
+    '-'        shift, and go to state 18
+    '!'        shift, and go to state 22
+
+    expr       go to state 131
+    term       go to state 38
+    factor     go to state 39
+    ValueStmt  go to state 40
+
+
+State 85
+
+   83 expr: expr '<' • expr
+
+    INT        shift, and go to state 2
+    FLOAT      shift, and go to state 3
+    TRUE       shift, and go to state 4
+    FALSE      shift, and go to state 5
+    ID         shift, and go to state 63
+    INT_LIT    shift, and go to state 15
+    FLOAT_LIT  shift, and go to state 16
+    '('        shift, and go to state 17
+    '-'        shift, and go to state 18
+    '!'        shift, and go to state 22
+
+    expr       go to state 132
+    term       go to state 38
+    factor     go to state 39
+    ValueStmt  go to state 40
+
+
+State 86
+
+   80 expr: expr '+' • expr
+
+    INT        shift, and go to state 2
+    FLOAT      shift, and go to state 3
+    TRUE       shift, and go to state 4
+    FALSE      shift, and go to state 5
+    ID         shift, and go to state 63
+    INT_LIT    shift, and go to state 15
+    FLOAT_LIT  shift, and go to state 16
+    '('        shift, and go to state 17
+    '-'        shift, and go to state 18
+    '!'        shift, and go to state 22
+
+    expr       go to state 133
+    term       go to state 38
+    factor     go to state 39
+    ValueStmt  go to state 40
+
+
+State 87
+
+   81 expr: expr '-' • expr
+
+    INT        shift, and go to state 2
+    FLOAT      shift, and go to state 3
+    TRUE       shift, and go to state 4
+    FALSE      shift, and go to state 5
+    ID         shift, and go to state 63
+    INT_LIT    shift, and go to state 15
+    FLOAT_LIT  shift, and go to state 16
+    '('        shift, and go to state 17
+    '-'        shift, and go to state 18
+    '!'        shift, and go to state 22
+
+    expr       go to state 134
+    term       go to state 38
+    factor     go to state 39
+    ValueStmt  go to state 40
+
+
+State 88
+
+   31 FunctionDeclStmt: expr ';' •
+
+    $default  reduce using rule 31 (FunctionDeclStmt)
+
+
+State 89
+
+   90 expr: term AS • factor
+
+    INT        shift, and go to state 2
+    FLOAT      shift, and go to state 3
+    TRUE       shift, and go to state 4
+    FALSE      shift, and go to state 5
+    ID         shift, and go to state 63
+    INT_LIT    shift, and go to state 15
+    FLOAT_LIT  shift, and go to state 16
+    '('        shift, and go to state 17
+    '-'        shift, and go to state 18
+    '!'        shift, and go to state 22
+
+    factor     go to state 135
+    ValueStmt  go to state 40
+
+
+State 90
+
+   92 term: term '*' • factor
+
+    INT        shift, and go to state 2
+    FLOAT      shift, and go to state 3
+    TRUE       shift, and go to state 4
+    FALSE      shift, and go to state 5
+    ID         shift, and go to state 63
+    INT_LIT    shift, and go to state 15
+    FLOAT_LIT  shift, and go to state 16
+    '('        shift, and go to state 17
+    '-'        shift, and go to state 18
+    '!'        shift, and go to state 22
+
+    factor     go to state 136
+    ValueStmt  go to state 40
+
+
+State 91
+
+   93 term: term '/' • factor
+
+    INT        shift, and go to state 2
+    FLOAT      shift, and go to state 3
+    TRUE       shift, and go to state 4
+    FALSE      shift, and go to state 5
+    ID         shift, and go to state 63
+    INT_LIT    shift, and go to state 15
+    FLOAT_LIT  shift, and go to state 16
+    '('        shift, and go to state 17
+    '-'        shift, and go to state 18
+    '!'        shift, and go to state 22
+
+    factor     go to state 137
+    ValueStmt  go to state 40
+
+
+State 92
+
+   94 term: term '%' • factor
+
+    INT        shift, and go to state 2
+    FLOAT      shift, and go to state 3
+    TRUE       shift, and go to state 4
+    FALSE      shift, and go to state 5
+    ID         shift, and go to state 63
+    INT_LIT    shift, and go to state 15
+    FLOAT_LIT  shift, and go to state 16
+    '('        shift, and go to state 17
+    '-'        shift, and go to state 18
+    '!'        shift, and go to state 22
+
+    factor     go to state 138
+    ValueStmt  go to state 40
+
+
+State 93
+
+   20 FunctionDeclStmt: PrintStmt ';' •
+
+    $default  reduce using rule 20 (FunctionDeclStmt)
+
+
+State 94
+
+  110 PrintStmt: PrintStmt • PrintStmt
+  110          | PrintStmt PrintStmt •
+
+    PRINT    shift, and go to state 9
+    PRINTLN  shift, and go to state 10
+
+    PRINT     [reduce using rule 110 (PrintStmt)]
+    PRINTLN   [reduce using rule 110 (PrintStmt)]
+    $default  reduce using rule 110 (PrintStmt)
+
+    PrintStmt  go to state 94
+
+
+State 95
+
+   22 FunctionDeclStmt: Stmt $@2 • ';'
+
+    ';'  shift, and go to state 139
+
+
+State 96
+
+  130 Stmt: LET MUT ID • ':' Stmt_opt '=' INT_LIT
+  131     | LET MUT ID • ':' Stmt_opt '=' FLOAT_LIT
+  132     | LET MUT ID • ':' Stmt_opt '=' TRUE
+  133     | LET MUT ID • ':' Stmt_opt '=' FALSE
+  134     | LET MUT ID • ':' Stmt_opt STR '=' '"' STRING_LIT '"'
+  135     | LET MUT ID • ':' Stmt_opt STR '=' '"' '"'
+  136     | LET MUT ID • ':' Stmt_opt
+  137     | LET MUT ID • '=' INT_LIT
+  138     | LET MUT ID • '=' FLOAT_LIT
+  145     | LET MUT ID • ':' Stmt_opt STR '=' LOOP Block
+
+    ':'  shift, and go to state 140
+    '='  shift, and go to state 141
+
+
+State 97
+
+   46 array_stmt: LET ID ':' • '[' INT ';' INT_LIT $@6 ']' '=' '[' INT_LIT
+  123 Stmt: LET ID ':' • Stmt_opt '=' INT_LIT
+  124     | LET ID ':' • Stmt_opt
+  125     | LET ID ':' • Stmt_opt '=' FLOAT_LIT
+  126     | LET ID ':' • Stmt_opt '=' TRUE
+  127     | LET ID ':' • Stmt_opt '=' FALSE
+  128     | LET ID ':' • Stmt_opt STR '=' '"' STRING_LIT '"'
+  129     | LET ID ':' • Stmt_opt STR '=' '"' '"'
+  144     | LET ID ':' • Stmt_opt STR '=' LOOP $@22 Block
+  146     | LET ID ':' • Stmt_opt STR '=' '&' ID '[' INT_LIT DOTDOT INT_LIT ']'
+  147     | LET ID ':' • Stmt_opt STR '=' '&' ID '[' DOTDOT INT_LIT ']'
+  148     | LET ID ':' • Stmt_opt STR '=' '&' ID '[' INT_LIT DOTDOT ']'
+
+    INT    shift, and go to state 142
+    FLOAT  shift, and go to state 143
+    BOOL   shift, and go to state 144
+    '*'    shift, and go to state 145
+    '['    shift, and go to state 146
+    '&'    shift, and go to state 147
+
+    Stmt_opt  go to state 148
+
+
+State 98
+
+  139 Stmt: LET ID '=' • INT_LIT
+  140     | LET ID '=' • FLOAT_LIT
+  141     | LET ID '=' • TRUE
+  142     | LET ID '=' • FALSE
+
+    TRUE       shift, and go to state 149
+    FALSE      shift, and go to state 150
+    INT_LIT    shift, and go to state 151
+    FLOAT_LIT  shift, and go to state 152
+
+
+State 99
+
+   64 if_stmt: IF $@7 expr • $@8 if_continue
+   80 expr: expr • '+' expr
+   81     | expr • '-' expr
+   82     | expr • '>' expr
+   83     | expr • '<' expr
+   84     | expr • LOR expr
+   85     | expr • LAND expr
+   86     | expr • GEQ expr
+   87     | expr • LEQ expr
+   88     | expr • EQL expr
+   89     | expr • NEQ expr
+
+    GEQ   shift, and go to state 78
+    LEQ   shift, and go to state 79
+    EQL   shift, and go to state 80
+    NEQ   shift, and go to state 81
+    LOR   shift, and go to state 82
+    LAND  shift, and go to state 83
+    '>'   shift, and go to state 84
+    '<'   shift, and go to state 85
+    '+'   shift, and go to state 86
+    '-'   shift, and go to state 87
+
+    $default  reduce using rule 63 ($@8)
+
+    $@8  go to state 153
+
+
+State 100
+
+   75 for_stmt: FOR ID IN • ID $@13 for_block
+
+    ID  shift, and go to state 154
+
+
+State 101
+
+   73 while_stmt: WHILE $@11 expr • $@12 Block
+   80 expr: expr • '+' expr
+   81     | expr • '-' expr
+   82     | expr • '>' expr
+   83     | expr • '<' expr
+   84     | expr • LOR expr
+   85     | expr • LAND expr
+   86     | expr • GEQ expr
+   87     | expr • LEQ expr
+   88     | expr • EQL expr
+   89     | expr • NEQ expr
+
+    GEQ   shift, and go to state 78
+    LEQ   shift, and go to state 79
+    EQL   shift, and go to state 80
+    NEQ   shift, and go to state 81
+    LOR   shift, and go to state 82
+    LAND  shift, and go to state 83
+    '>'   shift, and go to state 84
+    '<'   shift, and go to state 85
+    '+'   shift, and go to state 86
+    '-'   shift, and go to state 87
+
+    $default  reduce using rule 72 ($@12)
+
+    $@12  go to state 155
+
+
+State 102
+
+   97 factor: ID •
+  120 PrintStmt: PRINT '(' ID • $@19 '[' INT_LIT $@20 ']' ')'
+
+    '['       reduce using rule 118 ($@19)
+    $default  reduce using rule 97 (factor)
+
+    $@19  go to state 156
+
+
+State 103
+
+  122 string_stmt: '"' • STRING_LIT $@21 '"'
+
+    STRING_LIT  shift, and go to state 157
+
+
+State 104
+
+   80 expr: expr • '+' expr
+   81     | expr • '-' expr
+   82     | expr • '>' expr
+   83     | expr • '<' expr
+   84     | expr • LOR expr
+   85     | expr • LAND expr
+   86     | expr • GEQ expr
+   87     | expr • LEQ expr
+   88     | expr • EQL expr
+   89     | expr • NEQ expr
+  113 PrintStmt: PRINT '(' expr • ')'
+
+    GEQ   shift, and go to state 78
+    LEQ   shift, and go to state 79
+    EQL   shift, and go to state 80
+    NEQ   shift, and go to state 81
+    LOR   shift, and go to state 82
+    LAND  shift, and go to state 83
+    ')'   shift, and go to state 158
+    '>'   shift, and go to state 84
+    '<'   shift, and go to state 85
+    '+'   shift, and go to state 86
+    '-'   shift, and go to state 87
+
+
+State 105
+
+  111 PrintStmt: PRINT '(' string_stmt • ')'
+
+    ')'  shift, and go to state 159
+
+
+State 106
+
+   97 factor: ID •
+  117 PrintStmt: PRINTLN '(' ID • $@17 '[' INT_LIT $@18 ']' ')'
+
+    '['       reduce using rule 115 ($@17)
+    $default  reduce using rule 97 (factor)
+
+    $@17  go to state 160
+
+
+State 107
+
+   80 expr: expr • '+' expr
+   81     | expr • '-' expr
+   82     | expr • '>' expr
+   83     | expr • '<' expr
+   84     | expr • LOR expr
+   85     | expr • LAND expr
+   86     | expr • GEQ expr
+   87     | expr • LEQ expr
+   88     | expr • EQL expr
+   89     | expr • NEQ expr
+  114 PrintStmt: PRINTLN '(' expr • ')'
+
+    GEQ   shift, and go to state 78
+    LEQ   shift, and go to state 79
+    EQL   shift, and go to state 80
+    NEQ   shift, and go to state 81
+    LOR   shift, and go to state 82
+    LAND  shift, and go to state 83
+    ')'   shift, and go to state 161
+    '>'   shift, and go to state 84
+    '<'   shift, and go to state 85
+    '+'   shift, and go to state 86
+    '-'   shift, and go to state 87
+
+
+State 108
+
+  112 PrintStmt: PRINTLN '(' string_stmt • ')'
+
+    ')'  shift, and go to state 162
+
+
+State 109
+
+   19 FunctionDeclStmt: FUNC ID $@1 • '(' Func_opt Block
+
+    '('  shift, and go to state 163
+
+
+State 110
+
+   34 func_stmt: FUNC ID $@3 • '(' ID ':' INT ',' ID ':' INT ')' func_element Block
+
+    '('  shift, and go to state 164
+
+
+State 111
+
+   36 func_stmt: FUNC ID $@4 • '(' ')' Block
+
+    '('  shift, and go to state 165
+
+
+State 112
+
+   38 func_stmt: FUNC ID $@5 • '(' func_element ')' ARROW BOOL Block
+
+    '('  shift, and go to state 166
+
+
+State 113
+
+   44 break_stmt: BREAK '"' STRING_LIT • '"'
+
+    '"'  shift, and go to state 167
+
+
+State 114
+
+   53 Simpile_stmt: ID ADD_ASSIGN expr •
+   80 expr: expr • '+' expr
+   81     | expr • '-' expr
+   82     | expr • '>' expr
+   83     | expr • '<' expr
+   84     | expr • LOR expr
+   85     | expr • LAND expr
+   86     | expr • GEQ expr
+   87     | expr • LEQ expr
+   88     | expr • EQL expr
+   89     | expr • NEQ expr
+
+    GEQ   shift, and go to state 78
+    LEQ   shift, and go to state 79
+    EQL   shift, and go to state 80
+    NEQ   shift, and go to state 81
+    LOR   shift, and go to state 82
+    LAND  shift, and go to state 83
+    '>'   shift, and go to state 84
+    '<'   shift, and go to state 85
+    '+'   shift, and go to state 86
+    '-'   shift, and go to state 87
+
+    $default  reduce using rule 53 (Simpile_stmt)
+
+
+State 115
+
+   54 Simpile_stmt: ID SUB_ASSIGN expr •
+   80 expr: expr • '+' expr
+   81     | expr • '-' expr
+   82     | expr • '>' expr
+   83     | expr • '<' expr
+   84     | expr • LOR expr
+   85     | expr • LAND expr
+   86     | expr • GEQ expr
+   87     | expr • LEQ expr
+   88     | expr • EQL expr
+   89     | expr • NEQ expr
+
+    GEQ   shift, and go to state 78
+    LEQ   shift, and go to state 79
+    EQL   shift, and go to state 80
+    NEQ   shift, and go to state 81
+    LOR   shift, and go to state 82
+    LAND  shift, and go to state 83
+    '>'   shift, and go to state 84
+    '<'   shift, and go to state 85
+    '+'   shift, and go to state 86
+    '-'   shift, and go to state 87
+
+    $default  reduce using rule 54 (Simpile_stmt)
+
+
+State 116
+
+   55 Simpile_stmt: ID MUL_ASSIGN expr •
+   80 expr: expr • '+' expr
+   81     | expr • '-' expr
+   82     | expr • '>' expr
+   83     | expr • '<' expr
+   84     | expr • LOR expr
+   85     | expr • LAND expr
+   86     | expr • GEQ expr
+   87     | expr • LEQ expr
+   88     | expr • EQL expr
+   89     | expr • NEQ expr
+
+    GEQ   shift, and go to state 78
+    LEQ   shift, and go to state 79
+    EQL   shift, and go to state 80
+    NEQ   shift, and go to state 81
+    LOR   shift, and go to state 82
+    LAND  shift, and go to state 83
+    '>'   shift, and go to state 84
+    '<'   shift, and go to state 85
+    '+'   shift, and go to state 86
+    '-'   shift, and go to state 87
+
+    $default  reduce using rule 55 (Simpile_stmt)
+
+
+State 117
+
+   57 Simpile_stmt: ID DIV_ASSIGN expr •
+   80 expr: expr • '+' expr
+   81     | expr • '-' expr
+   82     | expr • '>' expr
+   83     | expr • '<' expr
+   84     | expr • LOR expr
+   85     | expr • LAND expr
+   86     | expr • GEQ expr
+   87     | expr • LEQ expr
+   88     | expr • EQL expr
+   89     | expr • NEQ expr
+
+    GEQ   shift, and go to state 78
+    LEQ   shift, and go to state 79
+    EQL   shift, and go to state 80
+    NEQ   shift, and go to state 81
+    LOR   shift, and go to state 82
+    LAND  shift, and go to state 83
+    '>'   shift, and go to state 84
+    '<'   shift, and go to state 85
+    '+'   shift, and go to state 86
+    '-'   shift, and go to state 87
+
+    $default  reduce using rule 57 (Simpile_stmt)
+
+
+State 118
+
+   56 Simpile_stmt: ID REM_ASSIGN expr •
+   80 expr: expr • '+' expr
+   81     | expr • '-' expr
+   82     | expr • '>' expr
+   83     | expr • '<' expr
+   84     | expr • LOR expr
+   85     | expr • LAND expr
+   86     | expr • GEQ expr
+   87     | expr • LEQ expr
+   88     | expr • EQL expr
+   89     | expr • NEQ expr
+
+    GEQ   shift, and go to state 78
+    LEQ   shift, and go to state 79
+    EQL   shift, and go to state 80
+    NEQ   shift, and go to state 81
+    LOR   shift, and go to state 82
+    LAND  shift, and go to state 83
+    '>'   shift, and go to state 84
+    '<'   shift, and go to state 85
+    '+'   shift, and go to state 86
+    '-'   shift, and go to state 87
+
+    $default  reduce using rule 56 (Simpile_stmt)
+
+
+State 119
+
+   58 Simpile_stmt: ID '=' ID • LSHIFT ID
+   97 factor: ID •
+
+    LSHIFT  shift, and go to state 168
+
+    $default  reduce using rule 97 (factor)
+
+
+State 120
+
+   60 Simpile_stmt: ID '=' '"' • STRING_LIT '"'
+   61             | ID '=' '"' • '"'
+
+    STRING_LIT  shift, and go to state 169
+    '"'         shift, and go to state 170
+
+
+State 121
+
+   59 Simpile_stmt: ID '=' expr •
+   80 expr: expr • '+' expr
+   81     | expr • '-' expr
+   82     | expr • '>' expr
+   83     | expr • '<' expr
+   84     | expr • LOR expr
+   85     | expr • LAND expr
+   86     | expr • GEQ expr
+   87     | expr • LEQ expr
+   88     | expr • EQL expr
+   89     | expr • NEQ expr
+
+    GEQ   shift, and go to state 78
+    LEQ   shift, and go to state 79
+    EQL   shift, and go to state 80
+    NEQ   shift, and go to state 81
+    LOR   shift, and go to state 82
+    LAND  shift, and go to state 83
+    '>'   shift, and go to state 84
+    '<'   shift, and go to state 85
+    '+'   shift, and go to state 86
+    '-'   shift, and go to state 87
+
+    $default  reduce using rule 59 (Simpile_stmt)
+
+
+State 122
+
+   96 factor: '(' expr ')' •
+
+    $default  reduce using rule 96 (factor)
+
+
+State 123
+
+    2 GlobalStatementList: GlobalStatementList • GlobalStatement
+  109 Block: '{' $@15 GlobalStatementList • $@16 '}'
+
+    LET        shift, and go to state 1
+    INT        shift, and go to state 2
+    FLOAT      shift, and go to state 3
+    TRUE       shift, and go to state 4
+    FALSE      shift, and go to state 5
+    IF         shift, and go to state 6
+    FOR        shift, and go to state 7
+    WHILE      shift, and go to state 8
+    PRINT      shift, and go to state 9
+    PRINTLN    shift, and go to state 10
+    FUNC       shift, and go to state 11
+    RETURN     shift, and go to state 12
+    BREAK      shift, and go to state 13
+    ID         shift, and go to state 14
+    INT_LIT    shift, and go to state 15
+    FLOAT_LIT  shift, and go to state 16
+    '('        shift, and go to state 17
+    '-'        shift, and go to state 18
+    ','        shift, and go to state 19
+    ']'        shift, and go to state 20
+    '{'        shift, and go to state 21
+    '!'        shift, and go to state 22
+
+    $default  reduce using rule 108 ($@16)
+
+    GlobalStatement   go to state 71
+    return_stmt       go to state 26
+    FunctionDeclStmt  go to state 27
+    func_stmt         go to state 28
+    break_stmt        go to state 29
+    array_stmt        go to state 30
+    array_stmt_again  go to state 31
+    new_element       go to state 32
+    Simpile_stmt      go to state 33
+    if_stmt           go to state 34
+    while_stmt        go to state 35
+    for_stmt          go to state 36
+    expr              go to state 37
+    term              go to state 38
+    factor            go to state 39
+    ValueStmt         go to state 40
+    Block             go to state 41
+    $@16              go to state 171
+    PrintStmt         go to state 42
+    Stmt              go to state 43
+
+
+State 124
+
+   46 array_stmt: LET ID • ':' '[' INT ';' INT_LIT $@6 ']' '=' '[' INT_LIT
+
+    ':'  shift, and go to state 172
+
+
+State 125
+
+   80 expr: expr • '+' expr
+   81     | expr • '-' expr
+   82     | expr • '>' expr
+   83     | expr • '<' expr
+   84     | expr • LOR expr
+   85     | expr • LAND expr
+   86     | expr • GEQ expr
+   86     | expr GEQ expr •
+   87     | expr • LEQ expr
+   88     | expr • EQL expr
+   89     | expr • NEQ expr
+
+    '+'  shift, and go to state 86
+    '-'  shift, and go to state 87
+
+    $default  reduce using rule 86 (expr)
+
+
+State 126
+
+   80 expr: expr • '+' expr
+   81     | expr • '-' expr
+   82     | expr • '>' expr
+   83     | expr • '<' expr
+   84     | expr • LOR expr
+   85     | expr • LAND expr
+   86     | expr • GEQ expr
+   87     | expr • LEQ expr
+   87     | expr LEQ expr •
+   88     | expr • EQL expr
+   89     | expr • NEQ expr
+
+    '+'  shift, and go to state 86
+    '-'  shift, and go to state 87
+
+    $default  reduce using rule 87 (expr)
+
+
+State 127
+
+   80 expr: expr • '+' expr
+   81     | expr • '-' expr
+   82     | expr • '>' expr
+   83     | expr • '<' expr
+   84     | expr • LOR expr
+   85     | expr • LAND expr
+   86     | expr • GEQ expr
+   87     | expr • LEQ expr
+   88     | expr • EQL expr
+   88     | expr EQL expr •
+   89     | expr • NEQ expr
+
+    '+'  shift, and go to state 86
+    '-'  shift, and go to state 87
+
+    $default  reduce using rule 88 (expr)
+
+
+State 128
+
+   80 expr: expr • '+' expr
+   81     | expr • '-' expr
+   82     | expr • '>' expr
+   83     | expr • '<' expr
+   84     | expr • LOR expr
+   85     | expr • LAND expr
+   86     | expr • GEQ expr
+   87     | expr • LEQ expr
+   88     | expr • EQL expr
+   89     | expr • NEQ expr
+   89     | expr NEQ expr •
+
+    '+'  shift, and go to state 86
+    '-'  shift, and go to state 87
+
+    $default  reduce using rule 89 (expr)
+
+
+State 129
+
+   80 expr: expr • '+' expr
+   81     | expr • '-' expr
+   82     | expr • '>' expr
+   83     | expr • '<' expr
+   84     | expr • LOR expr
+   84     | expr LOR expr •
+   85     | expr • LAND expr
+   86     | expr • GEQ expr
+   87     | expr • LEQ expr
+   88     | expr • EQL expr
+   89     | expr • NEQ expr
+
+    GEQ   shift, and go to state 78
+    LEQ   shift, and go to state 79
+    EQL   shift, and go to state 80
+    NEQ   shift, and go to state 81
+    LAND  shift, and go to state 83
+    '>'   shift, and go to state 84
+    '<'   shift, and go to state 85
+    '+'   shift, and go to state 86
+    '-'   shift, and go to state 87
+
+    $default  reduce using rule 84 (expr)
+
+
+State 130
+
+   80 expr: expr • '+' expr
+   81     | expr • '-' expr
+   82     | expr • '>' expr
+   83     | expr • '<' expr
+   84     | expr • LOR expr
+   85     | expr • LAND expr
+   85     | expr LAND expr •
+   86     | expr • GEQ expr
+   87     | expr • LEQ expr
+   88     | expr • EQL expr
+   89     | expr • NEQ expr
+
+    GEQ  shift, and go to state 78
+    LEQ  shift, and go to state 79
+    EQL  shift, and go to state 80
+    NEQ  shift, and go to state 81
+    '>'  shift, and go to state 84
+    '<'  shift, and go to state 85
+    '+'  shift, and go to state 86
+    '-'  shift, and go to state 87
+
+    $default  reduce using rule 85 (expr)
+
+
+State 131
+
+   80 expr: expr • '+' expr
+   81     | expr • '-' expr
+   82     | expr • '>' expr
+   82     | expr '>' expr •
+   83     | expr • '<' expr
+   84     | expr • LOR expr
+   85     | expr • LAND expr
+   86     | expr • GEQ expr
+   87     | expr • LEQ expr
+   88     | expr • EQL expr
+   89     | expr • NEQ expr
+
+    '+'  shift, and go to state 86
+    '-'  shift, and go to state 87
+
+    $default  reduce using rule 82 (expr)
+
+
+State 132
+
+   80 expr: expr • '+' expr
+   81     | expr • '-' expr
+   82     | expr • '>' expr
+   83     | expr • '<' expr
+   83     | expr '<' expr •
+   84     | expr • LOR expr
+   85     | expr • LAND expr
+   86     | expr • GEQ expr
+   87     | expr • LEQ expr
+   88     | expr • EQL expr
+   89     | expr • NEQ expr
+
+    '+'  shift, and go to state 86
+    '-'  shift, and go to state 87
+
+    $default  reduce using rule 83 (expr)
+
+
+State 133
+
+   80 expr: expr • '+' expr
+   80     | expr '+' expr •
+   81     | expr • '-' expr
+   82     | expr • '>' expr
+   83     | expr • '<' expr
+   84     | expr • LOR expr
+   85     | expr • LAND expr
+   86     | expr • GEQ expr
+   87     | expr • LEQ expr
+   88     | expr • EQL expr
+   89     | expr • NEQ expr
+
+    $default  reduce using rule 80 (expr)
+
+
+State 134
+
+   80 expr: expr • '+' expr
+   81     | expr • '-' expr
+   81     | expr '-' expr •
+   82     | expr • '>' expr
+   83     | expr • '<' expr
+   84     | expr • LOR expr
+   85     | expr • LAND expr
+   86     | expr • GEQ expr
+   87     | expr • LEQ expr
+   88     | expr • EQL expr
+   89     | expr • NEQ expr
+
+    $default  reduce using rule 81 (expr)
+
+
+State 135
+
+   90 expr: term AS factor •
+
+    $default  reduce using rule 90 (expr)
+
+
+State 136
+
+   92 term: term '*' factor •
+
+    $default  reduce using rule 92 (term)
+
+
+State 137
+
+   93 term: term '/' factor •
+
+    $default  reduce using rule 93 (term)
+
+
+State 138
+
+   94 term: term '%' factor •
+
+    $default  reduce using rule 94 (term)
+
+
+State 139
+
+   22 FunctionDeclStmt: Stmt $@2 ';' •
+
+    $default  reduce using rule 22 (FunctionDeclStmt)
+
+
+State 140
+
+  130 Stmt: LET MUT ID ':' • Stmt_opt '=' INT_LIT
+  131     | LET MUT ID ':' • Stmt_opt '=' FLOAT_LIT
+  132     | LET MUT ID ':' • Stmt_opt '=' TRUE
+  133     | LET MUT ID ':' • Stmt_opt '=' FALSE
+  134     | LET MUT ID ':' • Stmt_opt STR '=' '"' STRING_LIT '"'
+  135     | LET MUT ID ':' • Stmt_opt STR '=' '"' '"'
+  136     | LET MUT ID ':' • Stmt_opt
+  145     | LET MUT ID ':' • Stmt_opt STR '=' LOOP Block
+
+    INT    shift, and go to state 142
+    FLOAT  shift, and go to state 143
+    BOOL   shift, and go to state 144
+    '*'    shift, and go to state 145
+    '&'    shift, and go to state 147
+
+    Stmt_opt  go to state 173
+
+
+State 141
+
+  137 Stmt: LET MUT ID '=' • INT_LIT
+  138     | LET MUT ID '=' • FLOAT_LIT
+
+    INT_LIT    shift, and go to state 174
+    FLOAT_LIT  shift, and go to state 175
+
+
+State 142
+
+  149 Stmt_opt: INT •
+
+    $default  reduce using rule 149 (Stmt_opt)
+
+
+State 143
+
+  150 Stmt_opt: FLOAT •
+
+    $default  reduce using rule 150 (Stmt_opt)
+
+
+State 144
+
+  151 Stmt_opt: BOOL •
+
+    $default  reduce using rule 151 (Stmt_opt)
+
+
+State 145
+
+  153 Stmt_opt: '*' •
+
+    $default  reduce using rule 153 (Stmt_opt)
+
+
+State 146
+
+   46 array_stmt: LET ID ':' '[' • INT ';' INT_LIT $@6 ']' '=' '[' INT_LIT
+
+    INT  shift, and go to state 176
+
+
+State 147
+
+  152 Stmt_opt: '&' •
+
+    $default  reduce using rule 152 (Stmt_opt)
+
+
+State 148
+
+  123 Stmt: LET ID ':' Stmt_opt • '=' INT_LIT
+  124     | LET ID ':' Stmt_opt •
+  125     | LET ID ':' Stmt_opt • '=' FLOAT_LIT
+  126     | LET ID ':' Stmt_opt • '=' TRUE
+  127     | LET ID ':' Stmt_opt • '=' FALSE
+  128     | LET ID ':' Stmt_opt • STR '=' '"' STRING_LIT '"'
+  129     | LET ID ':' Stmt_opt • STR '=' '"' '"'
+  144     | LET ID ':' Stmt_opt • STR '=' LOOP $@22 Block
+  146     | LET ID ':' Stmt_opt • STR '=' '&' ID '[' INT_LIT DOTDOT INT_LIT ']'
+  147     | LET ID ':' Stmt_opt • STR '=' '&' ID '[' DOTDOT INT_LIT ']'
+  148     | LET ID ':' Stmt_opt • STR '=' '&' ID '[' INT_LIT DOTDOT ']'
+
+    STR  shift, and go to state 177
+    '='  shift, and go to state 178
+
+    $default  reduce using rule 124 (Stmt)
+
+
+State 149
+
+  141 Stmt: LET ID '=' TRUE •
+
+    $default  reduce using rule 141 (Stmt)
+
+
+State 150
+
+  142 Stmt: LET ID '=' FALSE •
+
+    $default  reduce using rule 142 (Stmt)
+
+
+State 151
+
+  139 Stmt: LET ID '=' INT_LIT •
+
+    $default  reduce using rule 139 (Stmt)
+
+
+State 152
+
+  140 Stmt: LET ID '=' FLOAT_LIT •
+
+    $default  reduce using rule 140 (Stmt)
+
+
+State 153
+
+   64 if_stmt: IF $@7 expr $@8 • if_continue
+
+    '{'  shift, and go to state 21
+
+    if_continue  go to state 179
+    Block        go to state 180
+
+
+State 154
+
+   75 for_stmt: FOR ID IN ID • $@13 for_block
+
+    $default  reduce using rule 74 ($@13)
+
+    $@13  go to state 181
+
+
+State 155
+
+   73 while_stmt: WHILE $@11 expr $@12 • Block
+
+    '{'  shift, and go to state 21
+
+    Block  go to state 182
+
+
+State 156
+
+  120 PrintStmt: PRINT '(' ID $@19 • '[' INT_LIT $@20 ']' ')'
+
+    '['  shift, and go to state 183
+
+
+State 157
+
+  122 string_stmt: '"' STRING_LIT • $@21 '"'
+
+    $default  reduce using rule 121 ($@21)
+
+    $@21  go to state 184
+
+
+State 158
+
+  113 PrintStmt: PRINT '(' expr ')' •
+
+    $default  reduce using rule 113 (PrintStmt)
+
+
+State 159
+
+  111 PrintStmt: PRINT '(' string_stmt ')' •
+
+    $default  reduce using rule 111 (PrintStmt)
+
+
+State 160
+
+  117 PrintStmt: PRINTLN '(' ID $@17 • '[' INT_LIT $@18 ']' ')'
+
+    '['  shift, and go to state 185
+
+
+State 161
+
+  114 PrintStmt: PRINTLN '(' expr ')' •
+
+    $default  reduce using rule 114 (PrintStmt)
+
+
+State 162
+
+  112 PrintStmt: PRINTLN '(' string_stmt ')' •
+
+    $default  reduce using rule 112 (PrintStmt)
+
+
+State 163
+
+   19 FunctionDeclStmt: FUNC ID $@1 '(' • Func_opt Block
+
+    INT    shift, and go to state 186
+    FLOAT  shift, and go to state 187
+    BOOL   shift, and go to state 188
+    ID     shift, and go to state 189
+    ARROW  shift, and go to state 190
+    ')'    shift, and go to state 191
+    ':'    shift, and go to state 192
+    ','    shift, and go to state 193
+
+    Func_opt  go to state 194
+
+
+State 164
+
+   34 func_stmt: FUNC ID $@3 '(' • ID ':' INT ',' ID ':' INT ')' func_element Block
+
+    ID  shift, and go to state 195
+
+
+State 165
+
+   36 func_stmt: FUNC ID $@4 '(' • ')' Block
+
+    ')'  shift, and go to state 196
+
+
+State 166
+
+   38 func_stmt: FUNC ID $@5 '(' • func_element ')' ARROW BOOL Block
+
+    ID   shift, and go to state 197
+    ':'  shift, and go to state 198
+    ','  shift, and go to state 199
+
+    func_element  go to state 200
+
+
+State 167
+
+   44 break_stmt: BREAK '"' STRING_LIT '"' •
+
+    $default  reduce using rule 44 (break_stmt)
+
+
+State 168
+
+   58 Simpile_stmt: ID '=' ID LSHIFT • ID
+
+    ID  shift, and go to state 201
+
+
+State 169
+
+   60 Simpile_stmt: ID '=' '"' STRING_LIT • '"'
+
+    '"'  shift, and go to state 202
+
+
+State 170
+
+   61 Simpile_stmt: ID '=' '"' '"' •
+
+    $default  reduce using rule 61 (Simpile_stmt)
+
+
+State 171
+
+  109 Block: '{' $@15 GlobalStatementList $@16 • '}'
+
+    '}'  shift, and go to state 203
+
+
+State 172
+
+   46 array_stmt: LET ID ':' • '[' INT ';' INT_LIT $@6 ']' '=' '[' INT_LIT
+
+    '['  shift, and go to state 146
+
+
+State 173
+
+  130 Stmt: LET MUT ID ':' Stmt_opt • '=' INT_LIT
+  131     | LET MUT ID ':' Stmt_opt • '=' FLOAT_LIT
+  132     | LET MUT ID ':' Stmt_opt • '=' TRUE
+  133     | LET MUT ID ':' Stmt_opt • '=' FALSE
+  134     | LET MUT ID ':' Stmt_opt • STR '=' '"' STRING_LIT '"'
+  135     | LET MUT ID ':' Stmt_opt • STR '=' '"' '"'
+  136     | LET MUT ID ':' Stmt_opt •
+  145     | LET MUT ID ':' Stmt_opt • STR '=' LOOP Block
+
+    STR  shift, and go to state 204
+    '='  shift, and go to state 205
+
+    $default  reduce using rule 136 (Stmt)
+
+
+State 174
+
+  137 Stmt: LET MUT ID '=' INT_LIT •
+
+    $default  reduce using rule 137 (Stmt)
+
+
+State 175
+
+  138 Stmt: LET MUT ID '=' FLOAT_LIT •
+
+    $default  reduce using rule 138 (Stmt)
+
+
+State 176
+
+   46 array_stmt: LET ID ':' '[' INT • ';' INT_LIT $@6 ']' '=' '[' INT_LIT
+
+    ';'  shift, and go to state 206
+
+
+State 177
+
+  128 Stmt: LET ID ':' Stmt_opt STR • '=' '"' STRING_LIT '"'
+  129     | LET ID ':' Stmt_opt STR • '=' '"' '"'
+  144     | LET ID ':' Stmt_opt STR • '=' LOOP $@22 Block
+  146     | LET ID ':' Stmt_opt STR • '=' '&' ID '[' INT_LIT DOTDOT INT_LIT ']'
+  147     | LET ID ':' Stmt_opt STR • '=' '&' ID '[' DOTDOT INT_LIT ']'
+  148     | LET ID ':' Stmt_opt STR • '=' '&' ID '[' INT_LIT DOTDOT ']'
+
+    '='  shift, and go to state 207
+
+
+State 178
+
+  123 Stmt: LET ID ':' Stmt_opt '=' • INT_LIT
+  125     | LET ID ':' Stmt_opt '=' • FLOAT_LIT
+  126     | LET ID ':' Stmt_opt '=' • TRUE
+  127     | LET ID ':' Stmt_opt '=' • FALSE
+
+    TRUE       shift, and go to state 208
+    FALSE      shift, and go to state 209
+    INT_LIT    shift, and go to state 210
+    FLOAT_LIT  shift, and go to state 211
+
+
+State 179
+
+   64 if_stmt: IF $@7 expr $@8 if_continue •
+
+    $default  reduce using rule 64 (if_stmt)
+
+
+State 180
+
+   67 if_continue: Block • $@9 ELSE $@10 else_stmt
+   68            | Block •
+
+    ELSE      reduce using rule 65 ($@9)
+    $default  reduce using rule 68 (if_continue)
+
+    $@9  go to state 212
+
+
+State 181
+
+   75 for_stmt: FOR ID IN ID $@13 • for_block
+
+    LET        shift, and go to state 1
+    INT        shift, and go to state 2
+    FLOAT      shift, and go to state 3
+    TRUE       shift, and go to state 4
+    FALSE      shift, and go to state 5
+    IF         shift, and go to state 6
+    FOR        shift, and go to state 7
+    WHILE      shift, and go to state 8
+    PRINT      shift, and go to state 9
+    PRINTLN    shift, and go to state 10
+    FUNC       shift, and go to state 11
+    RETURN     shift, and go to state 12
+    BREAK      shift, and go to state 13
+    ID         shift, and go to state 14
+    INT_LIT    shift, and go to state 15
+    FLOAT_LIT  shift, and go to state 16
+    '('        shift, and go to state 17
+    '-'        shift, and go to state 18
+    ','        shift, and go to state 19
+    ']'        shift, and go to state 20
+    '{'        shift, and go to state 213
+    '!'        shift, and go to state 22
+
+    GlobalStatementList  go to state 214
+    GlobalStatement      go to state 25
+    return_stmt          go to state 26
+    FunctionDeclStmt     go to state 27
+    func_stmt            go to state 28
+    break_stmt           go to state 29
+    array_stmt           go to state 30
+    array_stmt_again     go to state 31
+    new_element          go to state 32
+    Simpile_stmt         go to state 33
+    if_stmt              go to state 34
+    while_stmt           go to state 35
+    for_stmt             go to state 36
+    for_block            go to state 215
+    expr                 go to state 37
+    term                 go to state 38
+    factor               go to state 39
+    ValueStmt            go to state 40
+    Block                go to state 41
+    PrintStmt            go to state 42
+    Stmt                 go to state 43
+
+
+State 182
+
+   73 while_stmt: WHILE $@11 expr $@12 Block •
+
+    $default  reduce using rule 73 (while_stmt)
+
+
+State 183
+
+  120 PrintStmt: PRINT '(' ID $@19 '[' • INT_LIT $@20 ']' ')'
+
+    INT_LIT  shift, and go to state 216
+
+
+State 184
+
+  122 string_stmt: '"' STRING_LIT $@21 • '"'
+
+    '"'  shift, and go to state 217
+
+
+State 185
+
+  117 PrintStmt: PRINTLN '(' ID $@17 '[' • INT_LIT $@18 ']' ')'
+
+    INT_LIT  shift, and go to state 218
+
+
+State 186
+
+    7 Func_opt: INT •
+
+    $default  reduce using rule 7 (Func_opt)
+
+
+State 187
+
+    8 Func_opt: FLOAT •
+
+    $default  reduce using rule 8 (Func_opt)
+
+
+State 188
+
+    9 Func_opt: BOOL •
+
+    $default  reduce using rule 9 (Func_opt)
+
+
+State 189
+
+    6 Func_opt: ID •
+
+    $default  reduce using rule 6 (Func_opt)
+
+
+State 190
+
+   10 Func_opt: ARROW •
+
+    $default  reduce using rule 10 (Func_opt)
+
+
+State 191
+
+   13 Func_opt: ')' •
+
+    $default  reduce using rule 13 (Func_opt)
+
+
+State 192
+
+   11 Func_opt: ':' •
+
+    $default  reduce using rule 11 (Func_opt)
+
+
+State 193
+
+   12 Func_opt: ',' •
+
+    $default  reduce using rule 12 (Func_opt)
+
+
+State 194
+
+    5 Func_opt: Func_opt • Func_opt
+   19 FunctionDeclStmt: FUNC ID $@1 '(' Func_opt • Block
+
+    INT    shift, and go to state 186
+    FLOAT  shift, and go to state 187
+    BOOL   shift, and go to state 188
+    ID     shift, and go to state 189
+    ARROW  shift, and go to state 190
+    ')'    shift, and go to state 191
+    ':'    shift, and go to state 192
+    ','    shift, and go to state 193
+    '{'    shift, and go to state 21
+
+    Func_opt  go to state 219
+    Block     go to state 220
+
+
+State 195
+
+   34 func_stmt: FUNC ID $@3 '(' ID • ':' INT ',' ID ':' INT ')' func_element Block
+
+    ':'  shift, and go to state 221
+
+
+State 196
+
+   36 func_stmt: FUNC ID $@4 '(' ')' • Block
+
+    '{'  shift, and go to state 21
+
+    Block  go to state 222
+
+
+State 197
+
+   42 func_element: ID • INT
+   43             | ID • FLOAT
+
+    INT    shift, and go to state 223
+    FLOAT  shift, and go to state 224
+
+
+State 198
+
+   40 func_element: ':' •
+
+    $default  reduce using rule 40 (func_element)
+
+
+State 199
+
+   41 func_element: ',' •
+
+    $default  reduce using rule 41 (func_element)
+
+
+State 200
+
+   38 func_stmt: FUNC ID $@5 '(' func_element • ')' ARROW BOOL Block
+   39 func_element: func_element • func_element
+
+    ID   shift, and go to state 197
+    ')'  shift, and go to state 225
+    ':'  shift, and go to state 198
+    ','  shift, and go to state 199
+
+    func_element  go to state 226
+
+
+State 201
+
+   58 Simpile_stmt: ID '=' ID LSHIFT ID •
+
+    $default  reduce using rule 58 (Simpile_stmt)
+
+
+State 202
+
+   60 Simpile_stmt: ID '=' '"' STRING_LIT '"' •
+
+    $default  reduce using rule 60 (Simpile_stmt)
+
+
+State 203
+
+  109 Block: '{' $@15 GlobalStatementList $@16 '}' •
+
+    $default  reduce using rule 109 (Block)
+
+
+State 204
+
+  134 Stmt: LET MUT ID ':' Stmt_opt STR • '=' '"' STRING_LIT '"'
+  135     | LET MUT ID ':' Stmt_opt STR • '=' '"' '"'
+  145     | LET MUT ID ':' Stmt_opt STR • '=' LOOP Block
+
+    '='  shift, and go to state 227
+
+
+State 205
+
+  130 Stmt: LET MUT ID ':' Stmt_opt '=' • INT_LIT
+  131     | LET MUT ID ':' Stmt_opt '=' • FLOAT_LIT
+  132     | LET MUT ID ':' Stmt_opt '=' • TRUE
+  133     | LET MUT ID ':' Stmt_opt '=' • FALSE
+
+    TRUE       shift, and go to state 228
+    FALSE      shift, and go to state 229
+    INT_LIT    shift, and go to state 230
+    FLOAT_LIT  shift, and go to state 231
+
+
+State 206
+
+   46 array_stmt: LET ID ':' '[' INT ';' • INT_LIT $@6 ']' '=' '[' INT_LIT
+
+    INT_LIT  shift, and go to state 232
+
+
+State 207
+
+  128 Stmt: LET ID ':' Stmt_opt STR '=' • '"' STRING_LIT '"'
+  129     | LET ID ':' Stmt_opt STR '=' • '"' '"'
+  144     | LET ID ':' Stmt_opt STR '=' • LOOP $@22 Block
+  146     | LET ID ':' Stmt_opt STR '=' • '&' ID '[' INT_LIT DOTDOT INT_LIT ']'
+  147     | LET ID ':' Stmt_opt STR '=' • '&' ID '[' DOTDOT INT_LIT ']'
+  148     | LET ID ':' Stmt_opt STR '=' • '&' ID '[' INT_LIT DOTDOT ']'
+
+    LOOP  shift, and go to state 233
+    '"'   shift, and go to state 234
+    '&'   shift, and go to state 235
+
+
+State 208
+
+  126 Stmt: LET ID ':' Stmt_opt '=' TRUE •
+
+    $default  reduce using rule 126 (Stmt)
+
+
+State 209
+
+  127 Stmt: LET ID ':' Stmt_opt '=' FALSE •
+
+    $default  reduce using rule 127 (Stmt)
+
+
+State 210
+
+  123 Stmt: LET ID ':' Stmt_opt '=' INT_LIT •
+
+    $default  reduce using rule 123 (Stmt)
+
+
+State 211
+
+  125 Stmt: LET ID ':' Stmt_opt '=' FLOAT_LIT •
+
+    $default  reduce using rule 125 (Stmt)
+
+
+State 212
+
+   67 if_continue: Block $@9 • ELSE $@10 else_stmt
+
+    ELSE  shift, and go to state 236
+
+
+State 213
+
+   77 for_block: '{' • GlobalStatementList $@14 '}'
+  109 Block: '{' • $@15 GlobalStatementList $@16 '}'
+
+    LET        shift, and go to state 1
+    INT        shift, and go to state 2
+    FLOAT      shift, and go to state 3
+    TRUE       shift, and go to state 4
+    FALSE      shift, and go to state 5
+    IF         shift, and go to state 6
+    FOR        shift, and go to state 7
+    WHILE      shift, and go to state 8
+    PRINT      shift, and go to state 9
+    PRINTLN    shift, and go to state 10
+    FUNC       shift, and go to state 11
+    RETURN     shift, and go to state 12
+    BREAK      shift, and go to state 13
+    ID         shift, and go to state 14
+    INT_LIT    shift, and go to state 15
+    FLOAT_LIT  shift, and go to state 16
+    '('        shift, and go to state 17
+    '-'        shift, and go to state 18
+    ','        shift, and go to state 19
+    ']'        shift, and go to state 20
+    '{'        shift, and go to state 21
+    '!'        shift, and go to state 22
+
+    LET        [reduce using rule 107 ($@15)]
+    INT        [reduce using rule 107 ($@15)]
+    FLOAT      [reduce using rule 107 ($@15)]
+    TRUE       [reduce using rule 107 ($@15)]
+    FALSE      [reduce using rule 107 ($@15)]
+    IF         [reduce using rule 107 ($@15)]
+    FOR        [reduce using rule 107 ($@15)]
+    WHILE      [reduce using rule 107 ($@15)]
+    PRINT      [reduce using rule 107 ($@15)]
+    PRINTLN    [reduce using rule 107 ($@15)]
+    FUNC       [reduce using rule 107 ($@15)]
+    RETURN     [reduce using rule 107 ($@15)]
+    BREAK      [reduce using rule 107 ($@15)]
+    ID         [reduce using rule 107 ($@15)]
+    INT_LIT    [reduce using rule 107 ($@15)]
+    FLOAT_LIT  [reduce using rule 107 ($@15)]
+    '('        [reduce using rule 107 ($@15)]
+    '-'        [reduce using rule 107 ($@15)]
+    ','        [reduce using rule 107 ($@15)]
+    ']'        [reduce using rule 107 ($@15)]
+    '{'        [reduce using rule 107 ($@15)]
+    '!'        [reduce using rule 107 ($@15)]
+
+    GlobalStatementList  go to state 237
+    GlobalStatement      go to state 25
+    return_stmt          go to state 26
+    FunctionDeclStmt     go to state 27
+    func_stmt            go to state 28
+    break_stmt           go to state 29
+    array_stmt           go to state 30
+    array_stmt_again     go to state 31
+    new_element          go to state 32
+    Simpile_stmt         go to state 33
+    if_stmt              go to state 34
+    while_stmt           go to state 35
+    for_stmt             go to state 36
+    expr                 go to state 37
+    term                 go to state 38
+    factor               go to state 39
+    ValueStmt            go to state 40
+    Block                go to state 41
+    $@15                 go to state 68
+    PrintStmt            go to state 42
+    Stmt                 go to state 43
+
+
+State 214
+
+    2 GlobalStatementList: GlobalStatementList • GlobalStatement
+   78 for_block: GlobalStatementList • for_block
+
+    LET        shift, and go to state 1
+    INT        shift, and go to state 2
+    FLOAT      shift, and go to state 3
+    TRUE       shift, and go to state 4
+    FALSE      shift, and go to state 5
+    IF         shift, and go to state 6
+    FOR        shift, and go to state 7
+    WHILE      shift, and go to state 8
+    PRINT      shift, and go to state 9
+    PRINTLN    shift, and go to state 10
+    FUNC       shift, and go to state 11
+    RETURN     shift, and go to state 12
+    BREAK      shift, and go to state 13
+    ID         shift, and go to state 14
+    INT_LIT    shift, and go to state 15
+    FLOAT_LIT  shift, and go to state 16
+    '('        shift, and go to state 17
+    '-'        shift, and go to state 18
+    ','        shift, and go to state 19
+    ']'        shift, and go to state 20
+    '{'        shift, and go to state 213
+    '!'        shift, and go to state 22
+
+    GlobalStatementList  go to state 214
+    GlobalStatement      go to state 238
+    return_stmt          go to state 26
+    FunctionDeclStmt     go to state 27
+    func_stmt            go to state 28
+    break_stmt           go to state 29
+    array_stmt           go to state 30
+    array_stmt_again     go to state 31
+    new_element          go to state 32
+    Simpile_stmt         go to state 33
+    if_stmt              go to state 34
+    while_stmt           go to state 35
+    for_stmt             go to state 36
+    for_block            go to state 239
+    expr                 go to state 37
+    term                 go to state 38
+    factor               go to state 39
+    ValueStmt            go to state 40
+    Block                go to state 41
+    PrintStmt            go to state 42
+    Stmt                 go to state 43
+
+
+State 215
+
+   75 for_stmt: FOR ID IN ID $@13 for_block •
+
+    $default  reduce using rule 75 (for_stmt)
+
+
+State 216
+
+  120 PrintStmt: PRINT '(' ID $@19 '[' INT_LIT • $@20 ']' ')'
+
+    $default  reduce using rule 119 ($@20)
+
+    $@20  go to state 240
+
+
+State 217
+
+  122 string_stmt: '"' STRING_LIT $@21 '"' •
+
+    $default  reduce using rule 122 (string_stmt)
+
+
+State 218
+
+  117 PrintStmt: PRINTLN '(' ID $@17 '[' INT_LIT • $@18 ']' ')'
+
+    $default  reduce using rule 116 ($@18)
+
+    $@18  go to state 241
+
+
+State 219
+
+    5 Func_opt: Func_opt • Func_opt
+    5         | Func_opt Func_opt •
+
+    INT    shift, and go to state 186
+    FLOAT  shift, and go to state 187
+    BOOL   shift, and go to state 188
+    ID     shift, and go to state 189
+    ARROW  shift, and go to state 190
+    ')'    shift, and go to state 191
+    ':'    shift, and go to state 192
+    ','    shift, and go to state 193
+
+    INT       [reduce using rule 5 (Func_opt)]
+    FLOAT     [reduce using rule 5 (Func_opt)]
+    BOOL      [reduce using rule 5 (Func_opt)]
+    ID        [reduce using rule 5 (Func_opt)]
+    ARROW     [reduce using rule 5 (Func_opt)]
+    ')'       [reduce using rule 5 (Func_opt)]
+    ':'       [reduce using rule 5 (Func_opt)]
+    ','       [reduce using rule 5 (Func_opt)]
+    $default  reduce using rule 5 (Func_opt)
+
+    Func_opt  go to state 219
+
+
+State 220
+
+   19 FunctionDeclStmt: FUNC ID $@1 '(' Func_opt Block •
+
+    $default  reduce using rule 19 (FunctionDeclStmt)
+
+
+State 221
+
+   34 func_stmt: FUNC ID $@3 '(' ID ':' • INT ',' ID ':' INT ')' func_element Block
+
+    INT  shift, and go to state 242
+
+
+State 222
+
+   36 func_stmt: FUNC ID $@4 '(' ')' Block •
+
+    $default  reduce using rule 36 (func_stmt)
+
+
+State 223
+
+   42 func_element: ID INT •
+
+    $default  reduce using rule 42 (func_element)
+
+
+State 224
+
+   43 func_element: ID FLOAT •
+
+    $default  reduce using rule 43 (func_element)
+
+
+State 225
+
+   38 func_stmt: FUNC ID $@5 '(' func_element ')' • ARROW BOOL Block
+
+    ARROW  shift, and go to state 243
+
+
+State 226
+
+   39 func_element: func_element • func_element
+   39             | func_element func_element •
+
+    ID   shift, and go to state 197
+    ':'  shift, and go to state 198
+    ','  shift, and go to state 199
+
+    ID        [reduce using rule 39 (func_element)]
+    ':'       [reduce using rule 39 (func_element)]
+    ','       [reduce using rule 39 (func_element)]
+    $default  reduce using rule 39 (func_element)
+
+    func_element  go to state 226
+
+
+State 227
+
+  134 Stmt: LET MUT ID ':' Stmt_opt STR '=' • '"' STRING_LIT '"'
+  135     | LET MUT ID ':' Stmt_opt STR '=' • '"' '"'
+  145     | LET MUT ID ':' Stmt_opt STR '=' • LOOP Block
+
+    LOOP  shift, and go to state 244
+    '"'   shift, and go to state 245
+
+
+State 228
+
+  132 Stmt: LET MUT ID ':' Stmt_opt '=' TRUE •
+
+    $default  reduce using rule 132 (Stmt)
+
+
+State 229
+
+  133 Stmt: LET MUT ID ':' Stmt_opt '=' FALSE •
+
+    $default  reduce using rule 133 (Stmt)
+
+
+State 230
+
+  130 Stmt: LET MUT ID ':' Stmt_opt '=' INT_LIT •
+
+    $default  reduce using rule 130 (Stmt)
+
+
+State 231
+
+  131 Stmt: LET MUT ID ':' Stmt_opt '=' FLOAT_LIT •
+
+    $default  reduce using rule 131 (Stmt)
+
+
+State 232
+
+   46 array_stmt: LET ID ':' '[' INT ';' INT_LIT • $@6 ']' '=' '[' INT_LIT
+
+    $default  reduce using rule 45 ($@6)
+
+    $@6  go to state 246
+
+
+State 233
+
+  144 Stmt: LET ID ':' Stmt_opt STR '=' LOOP • $@22 Block
+
+    $default  reduce using rule 143 ($@22)
+
+    $@22  go to state 247
+
+
+State 234
+
+  128 Stmt: LET ID ':' Stmt_opt STR '=' '"' • STRING_LIT '"'
+  129     | LET ID ':' Stmt_opt STR '=' '"' • '"'
+
+    STRING_LIT  shift, and go to state 248
+    '"'         shift, and go to state 249
+
+
+State 235
+
+  146 Stmt: LET ID ':' Stmt_opt STR '=' '&' • ID '[' INT_LIT DOTDOT INT_LIT ']'
+  147     | LET ID ':' Stmt_opt STR '=' '&' • ID '[' DOTDOT INT_LIT ']'
+  148     | LET ID ':' Stmt_opt STR '=' '&' • ID '[' INT_LIT DOTDOT ']'
+
+    ID  shift, and go to state 250
+
+
+State 236
+
+   67 if_continue: Block $@9 ELSE • $@10 else_stmt
+
+    $default  reduce using rule 66 ($@10)
+
+    $@10  go to state 251
+
+
+State 237
+
+    2 GlobalStatementList: GlobalStatementList • GlobalStatement
+   77 for_block: '{' GlobalStatementList • $@14 '}'
+
+    LET        shift, and go to state 1
+    INT        shift, and go to state 2
+    FLOAT      shift, and go to state 3
+    TRUE       shift, and go to state 4
+    FALSE      shift, and go to state 5
+    IF         shift, and go to state 6
+    FOR        shift, and go to state 7
+    WHILE      shift, and go to state 8
+    PRINT      shift, and go to state 9
+    PRINTLN    shift, and go to state 10
+    FUNC       shift, and go to state 11
+    RETURN     shift, and go to state 12
+    BREAK      shift, and go to state 13
+    ID         shift, and go to state 14
+    INT_LIT    shift, and go to state 15
+    FLOAT_LIT  shift, and go to state 16
+    '('        shift, and go to state 17
+    '-'        shift, and go to state 18
+    ','        shift, and go to state 19
+    ']'        shift, and go to state 20
+    '{'        shift, and go to state 21
+    '!'        shift, and go to state 22
+
+    $default  reduce using rule 76 ($@14)
+
+    GlobalStatement   go to state 71
+    return_stmt       go to state 26
+    FunctionDeclStmt  go to state 27
+    func_stmt         go to state 28
+    break_stmt        go to state 29
+    array_stmt        go to state 30
+    array_stmt_again  go to state 31
+    new_element       go to state 32
+    Simpile_stmt      go to state 33
+    if_stmt           go to state 34
+    while_stmt        go to state 35
+    for_stmt          go to state 36
+    $@14              go to state 252
+    expr              go to state 37
+    term              go to state 38
+    factor            go to state 39
+    ValueStmt         go to state 40
+    Block             go to state 41
+    PrintStmt         go to state 42
+    Stmt              go to state 43
+
+
+State 238
+
+    2 GlobalStatementList: GlobalStatementList GlobalStatement •
+    3                    | GlobalStatement •
+
+    LET        reduce using rule 2 (GlobalStatementList)
+    LET        [reduce using rule 3 (GlobalStatementList)]
+    INT        reduce using rule 2 (GlobalStatementList)
+    INT        [reduce using rule 3 (GlobalStatementList)]
+    FLOAT      reduce using rule 2 (GlobalStatementList)
+    FLOAT      [reduce using rule 3 (GlobalStatementList)]
+    TRUE       reduce using rule 2 (GlobalStatementList)
+    TRUE       [reduce using rule 3 (GlobalStatementList)]
+    FALSE      reduce using rule 2 (GlobalStatementList)
+    FALSE      [reduce using rule 3 (GlobalStatementList)]
+    IF         reduce using rule 2 (GlobalStatementList)
+    IF         [reduce using rule 3 (GlobalStatementList)]
+    FOR        reduce using rule 2 (GlobalStatementList)
+    FOR        [reduce using rule 3 (GlobalStatementList)]
+    WHILE      reduce using rule 2 (GlobalStatementList)
+    WHILE      [reduce using rule 3 (GlobalStatementList)]
+    PRINT      reduce using rule 2 (GlobalStatementList)
+    PRINT      [reduce using rule 3 (GlobalStatementList)]
+    PRINTLN    reduce using rule 2 (GlobalStatementList)
+    PRINTLN    [reduce using rule 3 (GlobalStatementList)]
+    FUNC       reduce using rule 2 (GlobalStatementList)
+    FUNC       [reduce using rule 3 (GlobalStatementList)]
+    RETURN     reduce using rule 2 (GlobalStatementList)
+    RETURN     [reduce using rule 3 (GlobalStatementList)]
+    BREAK      reduce using rule 2 (GlobalStatementList)
+    BREAK      [reduce using rule 3 (GlobalStatementList)]
+    ID         reduce using rule 2 (GlobalStatementList)
+    ID         [reduce using rule 3 (GlobalStatementList)]
+    INT_LIT    reduce using rule 2 (GlobalStatementList)
+    INT_LIT    [reduce using rule 3 (GlobalStatementList)]
+    FLOAT_LIT  reduce using rule 2 (GlobalStatementList)
+    FLOAT_LIT  [reduce using rule 3 (GlobalStatementList)]
+    '('        reduce using rule 2 (GlobalStatementList)
+    '('        [reduce using rule 3 (GlobalStatementList)]
+    '-'        reduce using rule 2 (GlobalStatementList)
+    '-'        [reduce using rule 3 (GlobalStatementList)]
+    ','        reduce using rule 2 (GlobalStatementList)
+    ','        [reduce using rule 3 (GlobalStatementList)]
+    ']'        reduce using rule 2 (GlobalStatementList)
+    ']'        [reduce using rule 3 (GlobalStatementList)]
+    '{'        reduce using rule 2 (GlobalStatementList)
+    '{'        [reduce using rule 3 (GlobalStatementList)]
+    '!'        reduce using rule 2 (GlobalStatementList)
+    '!'        [reduce using rule 3 (GlobalStatementList)]
+    $default   reduce using rule 2 (GlobalStatementList)
+
+
+State 239
+
+   78 for_block: GlobalStatementList for_block •
+
+    $default  reduce using rule 78 (for_block)
+
+
+State 240
+
+  120 PrintStmt: PRINT '(' ID $@19 '[' INT_LIT $@20 • ']' ')'
+
+    ']'  shift, and go to state 253
+
+
+State 241
+
+  117 PrintStmt: PRINTLN '(' ID $@17 '[' INT_LIT $@18 • ']' ')'
+
+    ']'  shift, and go to state 254
+
+
+State 242
+
+   34 func_stmt: FUNC ID $@3 '(' ID ':' INT • ',' ID ':' INT ')' func_element Block
+
+    ','  shift, and go to state 255
+
+
+State 243
+
+   38 func_stmt: FUNC ID $@5 '(' func_element ')' ARROW • BOOL Block
+
+    BOOL  shift, and go to state 256
+
+
+State 244
+
+  145 Stmt: LET MUT ID ':' Stmt_opt STR '=' LOOP • Block
+
+    '{'  shift, and go to state 21
+
+    Block  go to state 257
+
+
+State 245
+
+  134 Stmt: LET MUT ID ':' Stmt_opt STR '=' '"' • STRING_LIT '"'
+  135     | LET MUT ID ':' Stmt_opt STR '=' '"' • '"'
+
+    STRING_LIT  shift, and go to state 258
+    '"'         shift, and go to state 259
+
+
+State 246
+
+   46 array_stmt: LET ID ':' '[' INT ';' INT_LIT $@6 • ']' '=' '[' INT_LIT
+
+    ']'  shift, and go to state 260
+
+
+State 247
+
+  144 Stmt: LET ID ':' Stmt_opt STR '=' LOOP $@22 • Block
+
+    '{'  shift, and go to state 21
+
+    Block  go to state 261
+
+
+State 248
+
+  128 Stmt: LET ID ':' Stmt_opt STR '=' '"' STRING_LIT • '"'
+
+    '"'  shift, and go to state 262
+
+
+State 249
+
+  129 Stmt: LET ID ':' Stmt_opt STR '=' '"' '"' •
+
+    $default  reduce using rule 129 (Stmt)
+
+
+State 250
+
+  146 Stmt: LET ID ':' Stmt_opt STR '=' '&' ID • '[' INT_LIT DOTDOT INT_LIT ']'
+  147     | LET ID ':' Stmt_opt STR '=' '&' ID • '[' DOTDOT INT_LIT ']'
+  148     | LET ID ':' Stmt_opt STR '=' '&' ID • '[' INT_LIT DOTDOT ']'
+
+    '['  shift, and go to state 263
+
+
+State 251
+
+   67 if_continue: Block $@9 ELSE $@10 • else_stmt
+
+    IF   shift, and go to state 6
+    '{'  shift, and go to state 21
+
+    if_stmt    go to state 264
+    else_stmt  go to state 265
+    Block      go to state 266
+
+
+State 252
+
+   77 for_block: '{' GlobalStatementList $@14 • '}'
+
+    '}'  shift, and go to state 267
+
+
+State 253
+
+  120 PrintStmt: PRINT '(' ID $@19 '[' INT_LIT $@20 ']' • ')'
+
+    ')'  shift, and go to state 268
+
+
+State 254
+
+  117 PrintStmt: PRINTLN '(' ID $@17 '[' INT_LIT $@18 ']' • ')'
+
+    ')'  shift, and go to state 269
+
+
+State 255
+
+   34 func_stmt: FUNC ID $@3 '(' ID ':' INT ',' • ID ':' INT ')' func_element Block
+
+    ID  shift, and go to state 270
+
+
+State 256
+
+   38 func_stmt: FUNC ID $@5 '(' func_element ')' ARROW BOOL • Block
+
+    '{'  shift, and go to state 21
+
+    Block  go to state 271
+
+
+State 257
+
+  145 Stmt: LET MUT ID ':' Stmt_opt STR '=' LOOP Block •
+
+    $default  reduce using rule 145 (Stmt)
+
+
+State 258
+
+  134 Stmt: LET MUT ID ':' Stmt_opt STR '=' '"' STRING_LIT • '"'
+
+    '"'  shift, and go to state 272
+
+
+State 259
+
+  135 Stmt: LET MUT ID ':' Stmt_opt STR '=' '"' '"' •
+
+    $default  reduce using rule 135 (Stmt)
+
+
+State 260
+
+   46 array_stmt: LET ID ':' '[' INT ';' INT_LIT $@6 ']' • '=' '[' INT_LIT
+
+    '='  shift, and go to state 273
+
+
+State 261
+
+  144 Stmt: LET ID ':' Stmt_opt STR '=' LOOP $@22 Block •
+
+    $default  reduce using rule 144 (Stmt)
+
+
+State 262
+
+  128 Stmt: LET ID ':' Stmt_opt STR '=' '"' STRING_LIT '"' •
+
+    $default  reduce using rule 128 (Stmt)
+
+
+State 263
+
+  146 Stmt: LET ID ':' Stmt_opt STR '=' '&' ID '[' • INT_LIT DOTDOT INT_LIT ']'
+  147     | LET ID ':' Stmt_opt STR '=' '&' ID '[' • DOTDOT INT_LIT ']'
+  148     | LET ID ':' Stmt_opt STR '=' '&' ID '[' • INT_LIT DOTDOT ']'
+
+    DOTDOT   shift, and go to state 274
+    INT_LIT  shift, and go to state 275
+
+
+State 264
+
+   69 else_stmt: if_stmt •
+
+    $default  reduce using rule 69 (else_stmt)
+
+
+State 265
+
+   67 if_continue: Block $@9 ELSE $@10 else_stmt •
+
+    $default  reduce using rule 67 (if_continue)
+
+
+State 266
+
+   70 else_stmt: Block •
+
+    $default  reduce using rule 70 (else_stmt)
+
+
+State 267
+
+   77 for_block: '{' GlobalStatementList $@14 '}' •
+
+    $default  reduce using rule 77 (for_block)
+
+
+State 268
+
+  120 PrintStmt: PRINT '(' ID $@19 '[' INT_LIT $@20 ']' ')' •
+
+    $default  reduce using rule 120 (PrintStmt)
+
+
+State 269
+
+  117 PrintStmt: PRINTLN '(' ID $@17 '[' INT_LIT $@18 ']' ')' •
+
+    $default  reduce using rule 117 (PrintStmt)
+
+
+State 270
+
+   34 func_stmt: FUNC ID $@3 '(' ID ':' INT ',' ID • ':' INT ')' func_element Block
+
+    ':'  shift, and go to state 276
+
+
+State 271
+
+   38 func_stmt: FUNC ID $@5 '(' func_element ')' ARROW BOOL Block •
+
+    $default  reduce using rule 38 (func_stmt)
+
+
+State 272
+
+  134 Stmt: LET MUT ID ':' Stmt_opt STR '=' '"' STRING_LIT '"' •
+
+    $default  reduce using rule 134 (Stmt)
+
+
+State 273
+
+   46 array_stmt: LET ID ':' '[' INT ';' INT_LIT $@6 ']' '=' • '[' INT_LIT
+
+    '['  shift, and go to state 277
+
+
+State 274
+
+  147 Stmt: LET ID ':' Stmt_opt STR '=' '&' ID '[' DOTDOT • INT_LIT ']'
+
+    INT_LIT  shift, and go to state 278
+
+
+State 275
+
+  146 Stmt: LET ID ':' Stmt_opt STR '=' '&' ID '[' INT_LIT • DOTDOT INT_LIT ']'
+  148     | LET ID ':' Stmt_opt STR '=' '&' ID '[' INT_LIT • DOTDOT ']'
+
+    DOTDOT  shift, and go to state 279
+
+
+State 276
+
+   34 func_stmt: FUNC ID $@3 '(' ID ':' INT ',' ID ':' • INT ')' func_element Block
+
+    INT  shift, and go to state 280
+
+
+State 277
+
+   46 array_stmt: LET ID ':' '[' INT ';' INT_LIT $@6 ']' '=' '[' • INT_LIT
+
+    INT_LIT  shift, and go to state 281
+
+
+State 278
+
+  147 Stmt: LET ID ':' Stmt_opt STR '=' '&' ID '[' DOTDOT INT_LIT • ']'
+
+    ']'  shift, and go to state 282
+
+
+State 279
+
+  146 Stmt: LET ID ':' Stmt_opt STR '=' '&' ID '[' INT_LIT DOTDOT • INT_LIT ']'
+  148     | LET ID ':' Stmt_opt STR '=' '&' ID '[' INT_LIT DOTDOT • ']'
+
+    INT_LIT  shift, and go to state 283
+    ']'      shift, and go to state 284
+
+
+State 280
+
+   34 func_stmt: FUNC ID $@3 '(' ID ':' INT ',' ID ':' INT • ')' func_element Block
+
+    ')'  shift, and go to state 285
+
+
+State 281
+
+   46 array_stmt: LET ID ':' '[' INT ';' INT_LIT $@6 ']' '=' '[' INT_LIT •
+
+    $default  reduce using rule 46 (array_stmt)
+
+
+State 282
+
+  147 Stmt: LET ID ':' Stmt_opt STR '=' '&' ID '[' DOTDOT INT_LIT ']' •
+
+    $default  reduce using rule 147 (Stmt)
+
+
+State 283
+
+  146 Stmt: LET ID ':' Stmt_opt STR '=' '&' ID '[' INT_LIT DOTDOT INT_LIT • ']'
+
+    ']'  shift, and go to state 286
+
+
+State 284
+
+  148 Stmt: LET ID ':' Stmt_opt STR '=' '&' ID '[' INT_LIT DOTDOT ']' •
+
+    $default  reduce using rule 148 (Stmt)
+
+
+State 285
+
+   34 func_stmt: FUNC ID $@3 '(' ID ':' INT ',' ID ':' INT ')' • func_element Block
+
+    ID   shift, and go to state 197
+    ':'  shift, and go to state 198
+    ','  shift, and go to state 199
+
+    func_element  go to state 287
+
+
+State 286
+
+  146 Stmt: LET ID ':' Stmt_opt STR '=' '&' ID '[' INT_LIT DOTDOT INT_LIT ']' •
+
+    $default  reduce using rule 146 (Stmt)
+
+
+State 287
+
+   34 func_stmt: FUNC ID $@3 '(' ID ':' INT ',' ID ':' INT ')' func_element • Block
+   39 func_element: func_element • func_element
+
+    ID   shift, and go to state 197
+    ':'  shift, and go to state 198
+    ','  shift, and go to state 199
+    '{'  shift, and go to state 21
+
+    func_element  go to state 226
+    Block         go to state 288
+
+
+State 288
+
+   34 func_stmt: FUNC ID $@3 '(' ID ':' INT ',' ID ':' INT ')' func_element Block •
+
+    $default  reduce using rule 34 (func_stmt)
